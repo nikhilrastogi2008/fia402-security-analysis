@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FIA 402 — Security Analysis | IFHE</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+  :root {
+    --bg: #f7f8fc;
+    --surface: #ffffff;
+    --surface2: #f0f2f8;
+    --border: #e2e6f0;
+    --primary: #1a3a6b;
+    --primary-light: #2a5298;
+    --accent: #c8a84b;
+    --accent-light: #f5e9c8;
+    --text: #1c2237;
+    --text-muted: #6b7a99;
+    --danger: #c0392b;
+    --danger-light: #fdecea;
+    --success: #1e7e5e;
+    --success-light: #e6f5ef;
+    --warn: #b45309;
+    --warn-light: #fef3cd;
+    --urgent: #7b1d1d;
+    --urgent-light: #fde8e8;
+    --radius: 8px;
+    --shadow: 0 2px 8px rgba(26,58,107,0.08);
+    --shadow-md: 0 4px 16px rgba(26,58,107,0.12);
+    --font: 'Georgia', 'Times New Roman', serif;
+    --font-ui: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-ui);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ---- HEADER ---- */
+  header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: #fff;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(26,58,107,0.25);
+  }
+
+  .header-left { display: flex; flex-direction: column; }
+  .header-course { font-size: 1.05rem; font-weight: 700; letter-spacing: 0.01em; }
+  .header-sub { font-size: 0.72rem; opacity: 0.75; margin-top: 1px; }
+
+  .header-right { display: flex; align-items: center; gap: 1rem; }
+
+  .role-badge {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1.5px solid rgba(255,255,255,0.4);
+    transition: background 0.2s;
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+  }
+  .role-badge:hover { background: rgba(255,255,255,0.22); }
+  .role-badge.instructor { background: var(--accent); color: var(--primary); border-color: var(--accent); }
+
+  /* ---- NAV TABS ---- */
+  nav {
+    background: var(--surface);
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    gap: 0;
+    padding: 0 2rem;
+    box-shadow: var(--shadow);
+  }
+
+  .nav-tab {
+    padding: 14px 20px;
+    font-size: 0.87rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 7px;
+    margin-bottom: -2px;
+    letter-spacing: 0.01em;
+  }
+  .nav-tab:hover { color: var(--primary); }
+  .nav-tab.active { color: var(--primary); border-bottom-color: var(--accent); }
+
+  /* ---- MAIN ---- */
+  main { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ---- CARDS ---- */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 1.25rem;
+  }
+
+  .card-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  /* ---- HOME TAB ---- */
+  .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  .home-grid .card.full { grid-column: 1 / -1; }
+
+  .course-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  .info-item { padding: 0.75rem; background: var(--surface2); border-radius: 6px; }
+  .info-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 3px; }
+  .info-value { font-size: 0.9rem; font-weight: 600; color: var(--text); }
+
+  .module-strip {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border-left: 4px solid var(--primary);
+    background: var(--surface2);
+    margin-bottom: 8px;
+  }
+  .module-strip-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .module-strip-title { font-size: 0.88rem; font-weight: 600; flex: 1; }
+  .module-strip-sessions { font-size: 0.75rem; color: var(--text-muted); }
+
+  .assessment-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .assessment-row:last-child { border-bottom: none; }
+  .assessment-name { font-size: 0.88rem; }
+  .assessment-pct {
+    font-size: 1.1rem; font-weight: 700; color: var(--primary);
+    background: var(--accent-light);
+    padding: 2px 10px; border-radius: 12px;
+  }
+
+  /* ---- MODULES TAB ---- */
+  .modules-layout { display: grid; grid-template-columns: 240px 1fr; gap: 1.5rem; }
+
+  .modules-sidebar .card { padding: 0.75rem; }
+  .module-btn {
+    width: 100%;
+    text-align: left;
+    padding: 10px 12px;
+    border: none;
+    background: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.83rem;
+    font-weight: 500;
+    color: var(--text);
+    transition: background 0.15s;
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 2px;
+  }
+  .module-btn:hover { background: var(--surface2); }
+  .module-btn.active { background: var(--primary); color: #fff; font-weight: 600; }
+  .module-btn .mod-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: rgba(0,0,0,0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 700; flex-shrink: 0;
+  }
+  .module-btn.active .mod-num { background: rgba(255,255,255,0.25); }
+
+  .session-card {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .session-header {
+    padding: 12px 16px;
+    background: var(--surface2);
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer;
+  }
+  .session-header:hover { background: #e8ebf5; }
+  .session-num {
+    font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 2px;
+  }
+  .session-title { font-size: 0.92rem; font-weight: 600; }
+  .session-body {
+    padding: 14px 16px;
+    display: none;
+    border-top: 1px solid var(--border);
+  }
+  .session-body.open { display: block; }
+
+  .concept-tag {
+    display: inline-block;
+    background: var(--accent-light);
+    color: var(--warn);
+    font-size: 0.73rem;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 12px;
+    margin: 3px 3px 3px 0;
+  }
+
+  .topics-list { list-style: none; padding: 0; }
+  .topics-list li {
+    padding: 4px 0;
+    font-size: 0.85rem;
+    color: var(--text);
+    display: flex; align-items: flex-start; gap: 8px;
+  }
+  .topics-list li::before { content: '›'; color: var(--primary); font-weight: 700; flex-shrink: 0; }
+
+  /* ---- RESOURCES TAB ---- */
+  .resource-filters { display: flex; gap: 10px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .filter-btn {
+    padding: 5px 14px; border-radius: 16px; border: 1.5px solid var(--border);
+    background: var(--surface); font-size: 0.78rem; font-weight: 600;
+    cursor: pointer; color: var(--text-muted); transition: all 0.15s;
+  }
+  .filter-btn:hover, .filter-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+  .resource-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 14px;
+    box-shadow: var(--shadow);
+  }
+  .resource-icon {
+    width: 40px; height: 40px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; flex-shrink: 0;
+  }
+  .resource-icon.pdf { background: #fde8e8; color: #c0392b; }
+  .resource-icon.slide { background: #e8f0fe; color: #1a73e8; }
+  .resource-icon.spreadsheet { background: #e6f4ea; color: #1e7e5e; }
+  .resource-icon.video { background: #fce8ff; color: #7b1fa2; }
+  .resource-icon.article { background: #fff3cd; color: #856404; }
+  .resource-icon.case { background: #e8f5e9; color: #2e7d32; }
+
+  .resource-meta { flex: 1; }
+  .resource-title { font-size: 0.92rem; font-weight: 600; margin-bottom: 3px; }
+  .resource-desc { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 5px; }
+  .resource-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag { font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+  .tag-module { background: var(--surface2); color: var(--primary); }
+  .tag-type { background: var(--accent-light); color: var(--warn); }
+  .tag-session { background: #e8f0fe; color: #1a73e8; }
+
+  .resource-actions { display: flex; gap: 8px; align-items: center; }
+
+  /* ---- ANNOUNCEMENTS TAB ---- */
+  .ann-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.25rem;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--primary);
+  }
+  .ann-item.important { border-left-color: var(--accent); }
+  .ann-item.urgent { border-left-color: var(--danger); background: var(--urgent-light); }
+  .ann-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .ann-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 5px; }
+  .ann-body { font-size: 0.87rem; color: var(--text); line-height: 1.6; margin-bottom: 8px; }
+  .ann-footer { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .priority-badge {
+    font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; padding: 2px 8px; border-radius: 10px;
+  }
+  .priority-badge.normal { background: var(--surface2); color: var(--text-muted); }
+  .priority-badge.important { background: var(--warn-light); color: var(--warn); }
+  .priority-badge.urgent { background: var(--urgent-light); color: var(--urgent); }
+  .ann-date { font-size: 0.73rem; color: var(--text-muted); }
+
+  /* ---- GLOSSARY TAB ---- */
+  .glossary-controls { display: flex; gap: 10px; margin-bottom: 1.25rem; align-items: center; flex-wrap: wrap; }
+  .glossary-search {
+    flex: 1; min-width: 200px;
+    padding: 8px 14px 8px 36px;
+    border: 1.5px solid var(--border); border-radius: 6px;
+    font-size: 0.88rem; background: var(--surface);
+    position: relative;
+  }
+  .search-wrap { position: relative; flex: 1; min-width: 200px; }
+  .search-wrap i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1rem; pointer-events: none; }
+
+  .alpha-filter { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 1rem; }
+  .alpha-btn {
+    width: 30px; height: 30px; border-radius: 4px; border: 1px solid var(--border);
+    background: var(--surface); font-size: 0.78rem; font-weight: 700; cursor: pointer;
+    color: var(--text-muted); transition: all 0.15s; display: flex; align-items: center; justify-content: center;
+  }
+  .alpha-btn:hover, .alpha-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+  .gloss-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin-bottom: 8px;
+    box-shadow: var(--shadow);
+    display: flex; align-items: flex-start; gap: 14px;
+  }
+  .gloss-letter {
+    width: 36px; height: 36px; border-radius: 6px;
+    background: var(--primary); color: #fff;
+    font-size: 1rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .gloss-content { flex: 1; }
+  .gloss-term { font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; }
+  .gloss-def { font-size: 0.84rem; color: var(--text); line-height: 1.55; margin-bottom: 6px; }
+  .gloss-footer { display: flex; gap: 6px; align-items: center; }
+
+  /* ---- BUTTONS ---- */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 16px; border-radius: 6px; border: none;
+    font-size: 0.82rem; font-weight: 600; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-light); }
+  .btn-accent { background: var(--accent); color: var(--primary); }
+  .btn-accent:hover { background: #b8923a; }
+  .btn-outline { background: var(--surface); color: var(--text); border: 1.5px solid var(--border); }
+  .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+  .btn-danger { background: var(--danger-light); color: var(--danger); }
+  .btn-danger:hover { background: var(--danger); color: #fff; }
+  .btn-sm { padding: 4px 10px; font-size: 0.75rem; }
+  .btn-success { background: var(--success-light); color: var(--success); }
+  .btn-success:hover { background: var(--success); color: #fff; }
+
+  /* ---- FORM / MODAL ---- */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45); z-index: 1000;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border-radius: var(--radius);
+    padding: 2rem; width: min(520px, 94vw);
+    box-shadow: var(--shadow-md);
+    max-height: 90vh; overflow-y: auto;
+  }
+  .modal-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.25rem; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+
+  .form-group { margin-bottom: 1rem; }
+  .form-label { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 5px; display: block; }
+  .form-control {
+    width: 100%; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 6px;
+    font-size: 0.88rem; font-family: var(--font-ui); color: var(--text);
+    background: var(--surface); transition: border-color 0.15s;
+  }
+  .form-control:focus { outline: none; border-color: var(--primary); }
+  textarea.form-control { resize: vertical; min-height: 80px; }
+  select.form-control { cursor: pointer; }
+
+  .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 1.5rem; }
+
+  /* ---- SECTION TITLES ---- */
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1.25rem;
+  }
+  .section-title {
+    font-size: 1.15rem; font-weight: 700; color: var(--primary);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title i { color: var(--accent); }
+
+  /* ---- EMPTY STATE ---- */
+  .empty-state {
+    text-align: center; padding: 3rem 1rem;
+    color: var(--text-muted);
+  }
+  .empty-state i { font-size: 2.5rem; opacity: 0.3; display: block; margin-bottom: 0.75rem; }
+  .empty-state p { font-size: 0.88rem; }
+
+  /* ---- UTILITIES ---- */
+  .text-muted { color: var(--text-muted); }
+  .flex { display: flex; }
+  .gap-2 { gap: 0.5rem; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+
+  /* ---- INSTRUCTOR SECTION ---- */
+  .instructor-section {
+    background: var(--accent-light);
+    border: 1px dashed var(--accent);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  .instructor-label {
+    font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--warn); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 5px;
+  }
+
+  /* ---- TOAST ---- */
+  #toast {
+    position: fixed; bottom: 1.5rem; right: 1.5rem;
+    background: var(--primary); color: #fff;
+    padding: 10px 18px; border-radius: 6px; font-size: 0.85rem; font-weight: 600;
+    box-shadow: var(--shadow-md); z-index: 9999;
+    transform: translateY(60px); opacity: 0; transition: all 0.3s;
+    pointer-events: none;
+  }
+  #toast.show { transform: translateY(0); opacity: 1; }
+
+  @media (max-width: 768px) {
+    main { padding: 1rem; }
+    .home-grid { grid-template-columns: 1fr; }
+    .home-grid .card.full { grid-column: 1; }
+    .modules-layout { grid-template-columns: 1fr; }
+    .course-info-grid { grid-template-columns: 1fr; }
+    nav { overflow-x: auto; padding: 0 1rem; }
+    .nav-tab { padding: 12px 14px; font-size: 0.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-left">
+    <span class="header-course">FIA 402 — Security Analysis</span>
+    <span class="header-sub">PGDM Term IV &nbsp;|&nbsp; AY 2026-27 &nbsp;|&nbsp; Prof. Nikhil Rastogi</span>
+  </div>
+  <div class="header-right">
+    <button class="role-badge" id="roleBtn" onclick="toggleRole()">
+      <i class="ti ti-user"></i>
+      <span id="roleBtnLabel">Student</span>
+    </button>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-tab active" onclick="switchTab('home')" id="tab-home">
+    <i class="ti ti-home"></i> Home
+  </div>
+  <div class="nav-tab" onclick="switchTab('modules')" id="tab-modules">
+    <i class="ti ti-book"></i> Modules
+  </div>
+  <div class="nav-tab" onclick="switchTab('resources')" id="tab-resources">
+    <i class="ti ti-folder"></i> Resources
+  </div>
+  <div class="nav-tab" onclick="switchTab('announcements')" id="tab-announcements">
+    <i class="ti ti-speakerphone"></i> Announcements
+  </div>
+  <div class="nav-tab" onclick="switchTab('glossary')" id="tab-glossary">
+    <i class="ti ti-vocabulary"></i> Glossary
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main>
+
+  <!-- ============ HOME ============ -->
+  <div class="tab-panel active" id="panel-home">
+    <div class="home-grid">
+
+      <!-- Course Info -->
+      <div class="card">
+        <div class="card-title"><i class="ti ti-info-circle"></i> Course Information</div>
+        <div class="course-info-grid">
+          <div class="info-item"><div class="info-label">Course Code</div><div class="info-value">FIA 402</div></div>
+          <div class="info-item"><div class="info-label">Program</div><div class="info-value">PGDM Term IV</div></div>
+          <div class="info-item"><div class="info-label">Academic Year</div><div class="info-value">2026-27</div></div>
+          <div class="info-item"><div class="info-label">Instructor</div><div class="info-value">Prof. Nikhil Rastogi</div></div>
+          <div class="info-item"><div class="info-label">Total Sessions</div><div class="info-value">20 Sessions</div></div>
+          <div class="info-item"><div class="info-label">Institution</div><div class="info-value">IBS Hyderabad, IFHE</div></div>
+        </div>
+      </div>
+
+      <!-- Assessment -->
+      <div class="card">
+        <div class="card-title"><i class="ti ti-report-analytics"></i> Assessment Scheme</div>
+        <div class="assessment-row">
+          <span class="assessment-name"><i class="ti ti-users" style="color:var(--text-muted)"></i> Class Participation</span>
+          <span class="assessment-pct">20%</span>
+        </div>
+        <div class="assessment-row">
+          <span class="assessment-name"><i class="ti ti-briefcase" style="color:var(--text-muted)"></i> Group Project</span>
+          <span class="assessment-pct">20%</span>
+        </div>
+        <div class="assessment-row">
+          <span class="assessment-name"><i class="ti ti-pencil" style="color:var(--text-muted)"></i> Mid-Term <span style="font-size:0.75rem;color:var(--text-muted)">(after Session 10)</span></span>
+          <span class="assessment-pct">20%</span>
+        </div>
+        <div class="assessment-row">
+          <span class="assessment-name"><i class="ti ti-certificate" style="color:var(--text-muted)"></i> End-Term Examination</span>
+          <span class="assessment-pct">40%</span>
+        </div>
+      </div>
+
+      <!-- Textbooks -->
+      <div class="card">
+        <div class="card-title"><i class="ti ti-books"></i> Prescribed Textbooks</div>
+        <div style="padding:10px 12px;background:var(--surface2);border-radius:6px;margin-bottom:8px;border-left:3px solid var(--primary);">
+          <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--primary);margin-bottom:3px;">Primary Textbook</div>
+          <div style="font-size:0.88rem;font-weight:600;">Investments</div>
+          <div style="font-size:0.78rem;color:var(--text-muted);">Bodie, Kane, Marcus &amp; Mohanty</div>
+        </div>
+        <div style="padding:10px 12px;background:var(--surface2);border-radius:6px;border-left:3px solid var(--accent);">
+          <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--warn);margin-bottom:3px;">Reference Book</div>
+          <div style="font-size:0.88rem;font-weight:600;">Investment Valuation</div>
+          <div style="font-size:0.78rem;color:var(--text-muted);">Aswath Damodaran</div>
+        </div>
+      </div>
+
+      <!-- Recent Announcements preview -->
+      <div class="card">
+        <div class="card-title"><i class="ti ti-speakerphone"></i> Recent Announcements</div>
+        <div id="homeAnnouncementsPreview">
+          <div class="empty-state" style="padding:1.5rem 1rem;">
+            <i class="ti ti-speakerphone"></i>
+            <p>No announcements yet.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Course Structure -->
+      <div class="card full">
+        <div class="card-title"><i class="ti ti-layout-list"></i> Course Structure</div>
+        <div id="homeModules">
+          <div class="module-strip"><div class="module-strip-num">1</div><div class="module-strip-title">Introduction to Investment Environment</div><div class="module-strip-sessions">2 Sessions</div></div>
+          <div class="module-strip"><div class="module-strip-num">2</div><div class="module-strip-title">Fixed Income Securities</div><div class="module-strip-sessions">7 Sessions</div></div>
+          <div class="module-strip"><div class="module-strip-num">3</div><div class="module-strip-title">EIC Analysis</div><div class="module-strip-sessions">2 Sessions</div></div>
+          <div class="module-strip"><div class="module-strip-num">4</div><div class="module-strip-title">Discounted Cash Flow Valuation</div><div class="module-strip-sessions">7 Sessions</div></div>
+          <div class="module-strip"><div class="module-strip-num">5</div><div class="module-strip-title">Relative Valuation</div><div class="module-strip-sessions">2 Sessions</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============ MODULES ============ -->
+  <div class="tab-panel" id="panel-modules">
+    <div class="modules-layout">
+      <div class="modules-sidebar">
+        <div class="card">
+          <div class="card-title"><i class="ti ti-list"></i> Modules</div>
+          <button class="module-btn active" onclick="selectModule(0)" id="mbtn-0"><span class="mod-num">1</span>Intro to Investment</button>
+          <button class="module-btn" onclick="selectModule(1)" id="mbtn-1"><span class="mod-num">2</span>Fixed Income</button>
+          <button class="module-btn" onclick="selectModule(2)" id="mbtn-2"><span class="mod-num">3</span>EIC Analysis</button>
+          <button class="module-btn" onclick="selectModule(3)" id="mbtn-3"><span class="mod-num">4</span>DCF Valuation</button>
+          <button class="module-btn" onclick="selectModule(4)" id="mbtn-4"><span class="mod-num">5</span>Relative Valuation</button>
+        </div>
+      </div>
+      <div>
+        <div id="module-content-area"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ RESOURCES ============ -->
+  <div class="tab-panel" id="panel-resources">
+    <div class="section-header">
+      <div class="section-title"><i class="ti ti-folder-open"></i> Learning Resources</div>
+    </div>
+    <div id="instructor-add-resource" style="display:none;">
+      <div class="instructor-section">
+        <div class="instructor-label"><i class="ti ti-lock-open"></i> Instructor Controls</div>
+        <button class="btn btn-primary" onclick="openModal('modalResource')">
+          <i class="ti ti-plus"></i> Add Resource
+        </button>
+      </div>
+    </div>
+    <div class="resource-filters" id="resourceFilters">
+      <button class="filter-btn active" onclick="filterResources('all', this)">All Modules</button>
+      <button class="filter-btn" onclick="filterResources('1', this)">Module 1</button>
+      <button class="filter-btn" onclick="filterResources('2', this)">Module 2</button>
+      <button class="filter-btn" onclick="filterResources('3', this)">Module 3</button>
+      <button class="filter-btn" onclick="filterResources('4', this)">Module 4</button>
+      <button class="filter-btn" onclick="filterResources('5', this)">Module 5</button>
+    </div>
+    <div id="resourcesList"></div>
+  </div>
+
+  <!-- ============ ANNOUNCEMENTS ============ -->
+  <div class="tab-panel" id="panel-announcements">
+    <div class="section-header">
+      <div class="section-title"><i class="ti ti-speakerphone"></i> Announcements</div>
+    </div>
+    <div id="instructor-add-ann" style="display:none;">
+      <div class="instructor-section">
+        <div class="instructor-label"><i class="ti ti-lock-open"></i> Instructor Controls</div>
+        <button class="btn btn-primary" onclick="openModal('modalAnn')">
+          <i class="ti ti-plus"></i> Post Announcement
+        </button>
+      </div>
+    </div>
+    <div id="announcementsList"></div>
+  </div>
+
+  <!-- ============ GLOSSARY ============ -->
+  <div class="tab-panel" id="panel-glossary">
+    <div class="section-header">
+      <div class="section-title"><i class="ti ti-vocabulary"></i> Finance Glossary</div>
+    </div>
+    <div id="instructor-add-gloss" style="display:none;">
+      <div class="instructor-section">
+        <div class="instructor-label"><i class="ti ti-lock-open"></i> Instructor Controls</div>
+        <button class="btn btn-primary" onclick="openModal('modalGloss')">
+          <i class="ti ti-plus"></i> Add Term
+        </button>
+      </div>
+    </div>
+    <div class="glossary-controls">
+      <div class="search-wrap">
+        <i class="ti ti-search"></i>
+        <input type="text" class="form-control glossary-search" id="glossSearch" placeholder="Search terms..." oninput="renderGlossary()">
+      </div>
+      <button class="filter-btn" onclick="filterGlossModule('all', this)" id="gmod-all" style="white-space:nowrap">All Modules</button>
+      <button class="filter-btn" onclick="filterGlossModule('1', this)" id="gmod-1">M1</button>
+      <button class="filter-btn" onclick="filterGlossModule('2', this)" id="gmod-2">M2</button>
+      <button class="filter-btn" onclick="filterGlossModule('3', this)" id="gmod-3">M3</button>
+      <button class="filter-btn" onclick="filterGlossModule('4', this)" id="gmod-4">M4</button>
+      <button class="filter-btn" onclick="filterGlossModule('5', this)" id="gmod-5">M5</button>
+    </div>
+    <div class="alpha-filter" id="alphaFilter"></div>
+    <div id="glossaryList"></div>
+  </div>
+
+</main>
+
+<!-- ============ MODALS ============ -->
+
+<!-- Password Modal -->
+<div class="modal-overlay" id="modalPassword">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-title"><i class="ti ti-lock"></i> Instructor Login</div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input type="password" class="form-control" id="pwdInput" placeholder="Enter instructor password" onkeydown="if(event.key==='Enter')checkPassword()">
+    </div>
+    <div id="pwdError" style="color:var(--danger);font-size:0.8rem;margin-bottom:0.75rem;display:none;">Incorrect password. Try again.</div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="closeModal('modalPassword')">Cancel</button>
+      <button class="btn btn-primary" onclick="checkPassword()"><i class="ti ti-login"></i> Login</button>
+    </div>
+  </div>
+</div>
+
+<!-- Resource Modal -->
+<div class="modal-overlay" id="modalResource">
+  <div class="modal">
+    <div class="modal-title"><i class="ti ti-folder-plus"></i> Add Resource</div>
+    <div class="form-group">
+      <label class="form-label">Title</label>
+      <input type="text" class="form-control" id="res-title" placeholder="Resource title">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <textarea class="form-control" id="res-desc" placeholder="Brief description of this resource"></textarea>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="form-group">
+        <label class="form-label">Module</label>
+        <select class="form-control" id="res-module">
+          <option value="1">Module 1 — Intro</option>
+          <option value="2">Module 2 — Fixed Income</option>
+          <option value="3">Module 3 — EIC</option>
+          <option value="4">Module 4 — DCF</option>
+          <option value="5">Module 5 — Relative</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Session Number</label>
+        <input type="number" class="form-control" id="res-session" placeholder="e.g. 3" min="1" max="20">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Type</label>
+      <select class="form-control" id="res-type">
+        <option value="pdf">PDF</option>
+        <option value="slide">Slide Deck</option>
+        <option value="spreadsheet">Spreadsheet</option>
+        <option value="video">Video</option>
+        <option value="article">Article</option>
+        <option value="case">Case Study</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Shareable URL</label>
+      <input type="url" class="form-control" id="res-url" placeholder="https://...">
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="closeModal('modalResource')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveResource()"><i class="ti ti-check"></i> Add Resource</button>
+    </div>
+  </div>
+</div>
+
+<!-- Announcement Modal -->
+<div class="modal-overlay" id="modalAnn">
+  <div class="modal">
+    <div class="modal-title"><i class="ti ti-speakerphone"></i> Post Announcement</div>
+    <div class="form-group">
+      <label class="form-label">Title</label>
+      <input type="text" class="form-control" id="ann-title" placeholder="Announcement title">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Message</label>
+      <textarea class="form-control" id="ann-body" placeholder="Write your announcement here..." style="min-height:100px"></textarea>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="form-group">
+        <label class="form-label">Priority</label>
+        <select class="form-control" id="ann-priority">
+          <option value="normal">Normal</option>
+          <option value="important">Important</option>
+          <option value="urgent">Urgent</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Module Tag (optional)</label>
+        <select class="form-control" id="ann-module">
+          <option value="">— None —</option>
+          <option value="1">Module 1</option>
+          <option value="2">Module 2</option>
+          <option value="3">Module 3</option>
+          <option value="4">Module 4</option>
+          <option value="5">Module 5</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="closeModal('modalAnn')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveAnnouncement()"><i class="ti ti-check"></i> Post</button>
+    </div>
+  </div>
+</div>
+
+<!-- Glossary Modal -->
+<div class="modal-overlay" id="modalGloss">
+  <div class="modal">
+    <div class="modal-title"><i class="ti ti-vocabulary"></i> Add Glossary Term</div>
+    <div class="form-group">
+      <label class="form-label">Term</label>
+      <input type="text" class="form-control" id="gloss-term" placeholder="Finance term">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Definition</label>
+      <textarea class="form-control" id="gloss-def" placeholder="Clear, concise definition..." style="min-height:90px"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Module Tag</label>
+      <select class="form-control" id="gloss-module">
+        <option value="1">Module 1 — Intro to Investment</option>
+        <option value="2">Module 2 — Fixed Income</option>
+        <option value="3">Module 3 — EIC Analysis</option>
+        <option value="4">Module 4 — DCF Valuation</option>
+        <option value="5">Module 5 — Relative Valuation</option>
+      </select>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="closeModal('modalGloss')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveGlossaryTerm()"><i class="ti ti-check"></i> Add Term</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+// =====================
+// DATA
+// =====================
+
+const MODULES_DATA = [
+  {
+    id: 1,
+    title: "Introduction to Investment Environment",
+    sessions: [
+      {
+        num: 1,
+        title: "Overview of Financial Markets and Investment Process",
+        topics: [
+          "Financial markets and their role in the economy",
+          "Types of financial instruments: equity, debt, derivatives",
+          "Investment process: return, risk, and trade-offs",
+          "Real vs. financial assets",
+          "Market participants: households, firms, financial intermediaries"
+        ],
+        concepts: ["Financial Asset", "Real Asset", "Risk-Return Trade-off", "Financial Intermediary"]
+      },
+      {
+        num: 2,
+        title: "Securities Markets and Trading Mechanisms",
+        topics: [
+          "Primary vs. secondary markets",
+          "Stock exchanges: NSE, BSE, NYSE",
+          "Trading mechanisms: order types, market vs. limit orders",
+          "Short selling and margin trading",
+          "Market indices: construction and interpretation"
+        ],
+        concepts: ["Primary Market", "Secondary Market", "Limit Order", "Short Selling", "Market Index"]
+      }
+    ]
+  },
+  {
+    id: 2,
+    title: "Fixed Income Securities",
+    sessions: [
+      {
+        num: 3,
+        title: "Bond Basics: Features and Pricing",
+        topics: [
+          "Bond terminology: face value, coupon, maturity, YTM",
+          "Bond pricing: present value of cash flows",
+          "Relationship between bond price and yield",
+          "Premium, discount, and par bonds",
+          "Clean vs. dirty price; accrued interest"
+        ],
+        concepts: ["Face Value", "Coupon Rate", "Yield to Maturity (YTM)", "Dirty Price", "Par Bond"]
+      },
+      {
+        num: 4,
+        title: "Yield Measures and Bond Returns",
+        topics: [
+          "Current yield, YTM, yield to call",
+          "Realized compound return vs. YTM",
+          "Holding period return on bonds",
+          "Reinvestment risk and its impact",
+          "Taxation of bond income"
+        ],
+        concepts: ["Current Yield", "Yield to Call", "Realized Compound Return", "Reinvestment Risk", "Holding Period Return"]
+      },
+      {
+        num: 5,
+        title: "Bond Price Sensitivity and Duration",
+        topics: [
+          "Inverse relationship: price and yield",
+          "Duration: Macaulay and Modified",
+          "Duration as a measure of interest rate sensitivity",
+          "Price change approximation using duration",
+          "Factors affecting duration: coupon, maturity, YTM"
+        ],
+        concepts: ["Macaulay Duration", "Modified Duration", "Price-Yield Relationship", "Interest Rate Risk"]
+      },
+      {
+        num: 6,
+        title: "Convexity and Fixed Income Portfolio Strategies",
+        topics: [
+          "Convexity: why duration alone is insufficient",
+          "Price change formula with convexity correction",
+          "Passive strategies: indexing and immunization",
+          "Active bond strategies: riding the yield curve",
+          "Horizon analysis and maturity management"
+        ],
+        concepts: ["Convexity", "Immunization", "Passive Strategy", "Riding the Yield Curve", "Horizon Analysis"]
+      },
+      {
+        num: 7,
+        title: "Term Structure of Interest Rates",
+        topics: [
+          "Yield curve: shapes and interpretation",
+          "Spot rates, forward rates, and their relationship",
+          "Theories: Expectations, Liquidity Preference, Segmentation",
+          "Bootstrapping spot rates from coupon bonds",
+          "Yield curve as economic indicator"
+        ],
+        concepts: ["Yield Curve", "Spot Rate", "Forward Rate", "Expectations Theory", "Liquidity Preference Theory"]
+      },
+      {
+        num: 8,
+        title: "Credit Risk and Bond Ratings",
+        topics: [
+          "Credit risk: probability of default and recovery",
+          "Bond ratings by CRISIL, ICRA, Moody's, S&P",
+          "Credit spreads and risk premiums",
+          "High-yield (junk) bonds",
+          "Sovereign vs. corporate credit risk"
+        ],
+        concepts: ["Credit Risk", "Bond Rating", "Credit Spread", "Default Risk", "High-Yield Bond"]
+      },
+      {
+        num: 9,
+        title: "Advanced Fixed Income Instruments",
+        topics: [
+          "Callable and putable bonds: embedded options",
+          "Convertible bonds and their valuation",
+          "Inflation-indexed bonds (TIPS, IIBs)",
+          "Mortgage-backed securities (MBS) overview",
+          "Floating rate notes and reference rates"
+        ],
+        concepts: ["Callable Bond", "Convertible Bond", "Inflation-Indexed Bond", "Mortgage-Backed Security", "Floating Rate Note"]
+      }
+    ]
+  },
+  {
+    id: 3,
+    title: "EIC Analysis",
+    sessions: [
+      {
+        num: 10,
+        title: "Macroeconomic Analysis and Industry Classification",
+        topics: [
+          "Top-down vs. bottom-up investment approach",
+          "Macroeconomic indicators: GDP, inflation, interest rates",
+          "Business cycle and sector rotation strategy",
+          "Industry analysis: Porter's Five Forces",
+          "PESTLE framework for environmental scanning"
+        ],
+        concepts: ["Top-Down Analysis", "Business Cycle", "Sector Rotation", "Porter's Five Forces", "PESTLE"]
+      },
+      {
+        num: 11,
+        title: "Company Analysis and Earnings Quality",
+        topics: [
+          "Financial statement analysis for equity valuation",
+          "Earnings quality: accruals vs. cash earnings",
+          "DuPont decomposition of ROE",
+          "Competitive advantage and moat analysis",
+          "Management quality and corporate governance"
+        ],
+        concepts: ["Earnings Quality", "DuPont Analysis", "Return on Equity (ROE)", "Economic Moat", "Corporate Governance"]
+      }
+    ]
+  },
+  {
+    id: 4,
+    title: "Discounted Cash Flow Valuation",
+    sessions: [
+      {
+        num: 12,
+        title: "Foundations of Equity Valuation",
+        topics: [
+          "Intrinsic value vs. market price",
+          "Absolute vs. relative valuation approaches",
+          "Dividend Discount Model (DDM) framework",
+          "Gordon Growth Model: assumptions and applications",
+          "Multi-stage growth models"
+        ],
+        concepts: ["Intrinsic Value", "Dividend Discount Model (DDM)", "Gordon Growth Model", "Multi-Stage Model", "Constant Growth"]
+      },
+      {
+        num: 13,
+        title: "Free Cash Flow to Equity (FCFE) Valuation",
+        topics: [
+          "FCFE: definition, calculation, and drivers",
+          "Net income to FCFE: working capital and capex adjustments",
+          "Stable growth FCFE model",
+          "Two-stage and three-stage FCFE models",
+          "When to use FCFE vs. DDM"
+        ],
+        concepts: ["Free Cash Flow to Equity (FCFE)", "Capital Expenditure", "Working Capital", "Two-Stage Model"]
+      },
+      {
+        num: 14,
+        title: "Free Cash Flow to Firm (FCFF) and WACC",
+        topics: [
+          "FCFF: operating cash flows to all capital providers",
+          "FCFE vs. FCFF: relationship and reconciliation",
+          "Weighted Average Cost of Capital (WACC)",
+          "Terminal value estimation: Gordon Growth and Exit Multiple",
+          "Enterprise value to equity value bridge"
+        ],
+        concepts: ["Free Cash Flow to Firm (FCFF)", "WACC", "Enterprise Value", "Terminal Value", "Equity Value"]
+      },
+      {
+        num: 15,
+        title: "Cost of Equity: CAPM and Alternatives",
+        topics: [
+          "Capital Asset Pricing Model (CAPM) and beta estimation",
+          "Risk-free rate and equity risk premium",
+          "Fama-French Three-Factor Model",
+          "Country risk premium for emerging markets",
+          "Build-up approach for private firms"
+        ],
+        concepts: ["CAPM", "Beta", "Equity Risk Premium (ERP)", "Fama-French Model", "Country Risk Premium"]
+      },
+      {
+        num: 16,
+        title: "Estimating Growth Rates",
+        topics: [
+          "Historical growth rates: arithmetic vs. geometric mean",
+          "Analyst forecasts and their reliability",
+          "Fundamental growth: retention ratio and ROE",
+          "Sustainable growth rate model",
+          "Decay in growth rates and mean reversion"
+        ],
+        concepts: ["Sustainable Growth Rate", "Retention Ratio", "Plowback Ratio", "Mean Reversion", "ROE-Based Growth"]
+      },
+      {
+        num: 17,
+        title: "DCF Valuation: Sensitivity and Scenario Analysis",
+        topics: [
+          "Sensitivity analysis: key value drivers",
+          "Scenario analysis: bull, base, bear cases",
+          "Monte Carlo simulation overview",
+          "Common pitfalls in DCF models",
+          "Reverse DCF: implied growth expectations"
+        ],
+        concepts: ["Sensitivity Analysis", "Scenario Analysis", "Monte Carlo Simulation", "Reverse DCF", "Value Driver"]
+      },
+      {
+        num: 18,
+        title: "Valuation of Special Cases",
+        topics: [
+          "Valuing high-growth and loss-making firms",
+          "Cyclical and commodity companies",
+          "Financial services firms: challenges and approaches",
+          "Startups and young companies: probability of failure",
+          "Valuing firms with negative book equity"
+        ],
+        concepts: ["High-Growth Firm", "Cyclical Valuation", "Financial Services Valuation", "Survival Probability", "Negative Book Equity"]
+      }
+    ]
+  },
+  {
+    id: 5,
+    title: "Relative Valuation",
+    sessions: [
+      {
+        num: 19,
+        title: "Price Multiples: P/E, P/B, P/S, EV/EBITDA",
+        topics: [
+          "Price-to-Earnings (P/E): trailing vs. forward, adjusted",
+          "PEG ratio: adjusting for growth",
+          "Price-to-Book (P/B) and ROE linkage",
+          "Price-to-Sales (P/S) for high-growth firms",
+          "EV/EBITDA: advantages over P/E"
+        ],
+        concepts: ["P/E Ratio", "PEG Ratio", "Price-to-Book (P/B)", "EV/EBITDA", "Price-to-Sales (P/S)"]
+      },
+      {
+        num: 20,
+        title: "Comparable Company Analysis and Valuation Summary",
+        topics: [
+          "Identifying and selecting comparable companies",
+          "Adjusting multiples for differences in growth and risk",
+          "Transaction multiples in M&A contexts",
+          "Football field chart: triangulating value",
+          "Integrating DCF and relative valuation for investment decisions"
+        ],
+        concepts: ["Comparable Company Analysis (CCA)", "Transaction Multiple", "Football Field Chart", "Valuation Range", "Control Premium"]
+      }
+    ]
+  }
+];
+
+const DEFAULT_GLOSSARY = [
+  { id: 'g1', term: 'Alpha', definition: 'Excess return of an investment relative to the return of a benchmark index.', module: '1' },
+  { id: 'g2', term: 'Beta', definition: 'A measure of a stock\'s volatility relative to the overall market. A beta of 1 means the stock moves with the market.', module: '4' },
+  { id: 'g3', term: 'Bond', definition: 'A fixed-income instrument representing a loan made by an investor to a borrower, typically a corporation or government.', module: '2' },
+  { id: 'g4', term: 'CAPM', definition: 'Capital Asset Pricing Model — describes the relationship between systematic risk and expected return for assets, particularly stocks.', module: '4' },
+  { id: 'g5', term: 'Convexity', definition: 'A measure of the curvature in the relationship between bond prices and yields, used to improve duration-based price sensitivity estimates.', module: '2' },
+  { id: 'g6', term: 'Coupon Rate', definition: 'The annual interest rate paid on a bond, expressed as a percentage of the face value.', module: '2' },
+  { id: 'g7', term: 'Credit Spread', definition: 'The difference in yield between a corporate bond and a comparable government bond of the same maturity, representing credit risk compensation.', module: '2' },
+  { id: 'g8', term: 'DCF', definition: 'Discounted Cash Flow — a valuation method that estimates the value of an investment based on its expected future cash flows discounted to the present.', module: '4' },
+  { id: 'g9', term: 'Duration', definition: 'A measure of the sensitivity of a bond\'s price to changes in interest rates, expressed in years. Macaulay duration is the weighted average time to receive cash flows.', module: '2' },
+  { id: 'g10', term: 'EIC Analysis', definition: 'Economy-Industry-Company framework for top-down fundamental analysis of equity investments.', module: '3' },
+  { id: 'g11', term: 'Enterprise Value', definition: 'Total value of a firm, calculated as market capitalization plus net debt plus minority interest. Represents the value to all capital providers.', module: '4' },
+  { id: 'g12', term: 'EV/EBITDA', definition: 'Enterprise Value to EBITDA ratio — a widely used valuation multiple that allows comparison across firms with different capital structures.', module: '5' },
+  { id: 'g13', term: 'FCFE', definition: 'Free Cash Flow to Equity — cash flow available to equity holders after meeting all financial obligations and reinvestment needs.', module: '4' },
+  { id: 'g14', term: 'FCFF', definition: 'Free Cash Flow to Firm — cash flow available to all capital providers (equity and debt) after meeting operating expenses and reinvestment needs.', module: '4' },
+  { id: 'g15', term: 'Gordon Growth Model', definition: 'A dividend discount model that values a stock as the present value of an infinite series of growing dividends: P = D1 / (r - g).', module: '4' },
+  { id: 'g16', term: 'Immunization', definition: 'A strategy to shield a fixed-income portfolio from interest rate risk by matching the duration of assets and liabilities.', module: '2' },
+  { id: 'g17', term: 'Intrinsic Value', definition: 'The true, inherent value of an asset based on fundamental analysis, independent of its market price.', module: '4' },
+  { id: 'g18', term: 'Market Index', definition: 'A statistical measure reflecting composite value of a selected group of stocks, used to track market performance (e.g., SENSEX, NIFTY 50).', module: '1' },
+  { id: 'g19', term: 'Modified Duration', definition: 'A measure of a bond\'s price sensitivity to a 1% change in yield, calculated as Macaulay Duration divided by (1 + YTM/m).', module: '2' },
+  { id: 'g20', term: 'P/E Ratio', definition: 'Price-to-Earnings ratio — the market price per share divided by earnings per share. A key equity valuation multiple.', module: '5' },
+  { id: 'g21', term: 'PEG Ratio', definition: 'Price/Earnings to Growth ratio — adjusts the P/E ratio for expected earnings growth to identify relatively undervalued growth stocks.', module: '5' },
+  { id: 'g22', term: 'Reinvestment Risk', definition: 'The risk that future cash flows from a bond will be reinvested at a lower rate than the original YTM, reducing total return.', module: '2' },
+  { id: 'g23', term: 'ROE', definition: 'Return on Equity — net income divided by shareholders\' equity; a measure of a company\'s profitability relative to equity capital.', module: '3' },
+  { id: 'g24', term: 'Sector Rotation', definition: 'An investment strategy that shifts capital among different economic sectors based on the stage of the business cycle.', module: '3' },
+  { id: 'g25', term: 'Spot Rate', definition: 'The current interest rate for borrowing or lending money for a specific time period, used in yield curve analysis.', module: '2' },
+  { id: 'g26', term: 'Terminal Value', definition: 'The estimated value of a business beyond the explicit forecast period, typically calculated using a perpetuity growth model or exit multiple.', module: '4' },
+  { id: 'g27', term: 'WACC', definition: 'Weighted Average Cost of Capital — the average rate a company pays for its capital (debt and equity), weighted by their respective proportions.', module: '4' },
+  { id: 'g28', term: 'Yield Curve', definition: 'A graphical plot of interest rates for bonds of equal credit quality but different maturities. Its shape provides insights into economic expectations.', module: '2' },
+  { id: 'g29', term: 'Yield to Maturity', definition: 'The total return expected on a bond if held until it matures, accounting for coupon payments and capital gain/loss. The most comprehensive yield measure.', module: '2' },
+  { id: 'g30', term: 'Short Selling', definition: 'Selling borrowed securities with the intention of repurchasing them at a lower price in the future to profit from a price decline.', module: '1' }
+];
+
+// =====================
+// STATE
+// =====================
+let isInstructor = false;
+let activeModule = 0;
+let resourceFilter = 'all';
+let glossModuleFilter = 'all';
+let glossAlphaFilter = 'all';
+
+function loadData(key, fallback) {
+  try { const d = localStorage.getItem('sa402_' + key); return d ? JSON.parse(d) : fallback; } catch(e) { return fallback; }
+}
+function saveData(key, val) { try { localStorage.setItem('sa402_' + key, JSON.stringify(val)); } catch(e) {} }
+
+let resources = loadData('resources', []);
+let announcements = loadData('announcements', []);
+let glossary = loadData('glossary', null);
+if (!glossary) { glossary = DEFAULT_GLOSSARY; saveData('glossary', glossary); }
+
+// =====================
+// ROLE MANAGEMENT
+// =====================
+function toggleRole() {
+  if (isInstructor) {
+    isInstructor = false;
+    updateRoleUI();
+    showToast('Switched to Student view');
+  } else {
+    document.getElementById('pwdInput').value = '';
+    document.getElementById('pwdError').style.display = 'none';
+    openModal('modalPassword');
+    setTimeout(() => document.getElementById('pwdInput').focus(), 100);
+  }
+}
+
+function checkPassword() {
+  const val = document.getElementById('pwdInput').value;
+  if (val === 'SA2026') {
+    closeModal('modalPassword');
+    isInstructor = true;
+    updateRoleUI();
+    showToast('Instructor mode activated');
+  } else {
+    document.getElementById('pwdError').style.display = 'block';
+    document.getElementById('pwdInput').select();
+  }
+}
+
+function updateRoleUI() {
+  const btn = document.getElementById('roleBtn');
+  const lbl = document.getElementById('roleBtnLabel');
+  if (isInstructor) {
+    btn.classList.add('instructor');
+    lbl.textContent = 'Instructor';
+    btn.querySelector('i').className = 'ti ti-lock-open';
+  } else {
+    btn.classList.remove('instructor');
+    lbl.textContent = 'Student';
+    btn.querySelector('i').className = 'ti ti-user';
+  }
+  document.getElementById('instructor-add-resource').style.display = isInstructor ? 'block' : 'none';
+  document.getElementById('instructor-add-ann').style.display = isInstructor ? 'block' : 'none';
+  document.getElementById('instructor-add-gloss').style.display = isInstructor ? 'block' : 'none';
+  renderResources();
+  renderAnnouncements();
+  renderGlossary();
+  renderHomeAnnouncements();
+}
+
+// =====================
+// TAB SWITCHING
+// =====================
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+// =====================
+// MODALS
+// =====================
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) closeModal(m.id); });
+});
+
+// =====================
+// TOAST
+// =====================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// =====================
+// MODULES TAB
+// =====================
+function selectModule(idx) {
+  activeModule = idx;
+  document.querySelectorAll('.module-btn').forEach((b, i) => {
+    b.classList.toggle('active', i === idx);
+  });
+  renderModuleContent();
+}
+
+function renderModuleContent() {
+  const m = MODULES_DATA[activeModule];
+  let html = `<div class="card" style="margin-bottom:0">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.25rem;">
+      <div style="width:40px;height:40px;border-radius:8px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;flex-shrink:0;">${m.id}</div>
+      <div>
+        <div style="font-size:1.05rem;font-weight:700;color:var(--primary)">${m.title}</div>
+        <div style="font-size:0.75rem;color:var(--text-muted)">${m.sessions.length} Session${m.sessions.length>1?'s':''}</div>
+      </div>
+    </div>`;
+
+  m.sessions.forEach(s => {
+    html += `<div class="session-card">
+      <div class="session-header" onclick="toggleSession('sess${s.num}')">
+        <div>
+          <div class="session-num">Session ${s.num}</div>
+          <div class="session-title">${s.title}</div>
+        </div>
+        <i class="ti ti-chevron-down" id="sessicon${s.num}" style="color:var(--text-muted);transition:transform 0.2s"></i>
+      </div>
+      <div class="session-body" id="sess${s.num}">
+        <div style="margin-bottom:10px">
+          <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:6px">Topics Covered</div>
+          <ul class="topics-list">
+            ${s.topics.map(t => `<li>${t}</li>`).join('')}
+          </ul>
+        </div>
+        <hr class="divider">
+        <div>
+          <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:6px">Key Concepts</div>
+          ${s.concepts.map(c => `<span class="concept-tag">${c}</span>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  });
+
+  html += '</div>';
+  document.getElementById('module-content-area').innerHTML = html;
+}
+
+function toggleSession(id) {
+  const body = document.getElementById(id);
+  const icon = document.getElementById('sessicon' + id.replace('sess', ''));
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  if (icon) icon.style.transform = isOpen ? '' : 'rotate(180deg)';
+}
+
+// =====================
+// RESOURCES
+// =====================
+const typeIcons = {
+  pdf: 'ti-file-type-pdf',
+  slide: 'ti-presentation',
+  spreadsheet: 'ti-table',
+  video: 'ti-player-play',
+  article: 'ti-news',
+  case: 'ti-briefcase-2'
+};
+const typeLabels = {
+  pdf: 'PDF', slide: 'Slide Deck', spreadsheet: 'Spreadsheet',
+  video: 'Video', article: 'Article', case: 'Case Study'
+};
+const moduleNames = {
+  '1': 'Module 1', '2': 'Module 2', '3': 'Module 3', '4': 'Module 4', '5': 'Module 5'
+};
+
+function filterResources(mod, btn) {
+  resourceFilter = mod;
+  document.querySelectorAll('#resourceFilters .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderResources();
+}
+
+function renderResources() {
+  const list = document.getElementById('resourcesList');
+  let filtered = resources.filter(r => resourceFilter === 'all' || r.module === resourceFilter);
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty-state"><i class="ti ti-folder-x"></i><p>No resources yet${resourceFilter !== 'all' ? ' for this module' : ''}. ${isInstructor ? 'Add one above.' : 'Check back later.'}</p></div>`;
+    return;
+  }
+  list.innerHTML = filtered.map(r => `
+    <div class="resource-item">
+      <div class="resource-icon ${r.type}">
+        <i class="ti ${typeIcons[r.type] || 'ti-file'}"></i>
+      </div>
+      <div class="resource-meta">
+        <div class="resource-title">${r.title}</div>
+        <div class="resource-desc">${r.description || ''}</div>
+        <div class="resource-tags">
+          <span class="tag tag-module">${moduleNames[r.module] || 'M' + r.module}</span>
+          <span class="tag tag-type">${typeLabels[r.type] || r.type}</span>
+          ${r.session ? `<span class="tag tag-session">Session ${r.session}</span>` : ''}
+        </div>
+      </div>
+      <div class="resource-actions">
+        ${r.url ? `<a href="${r.url}" target="_blank" class="btn btn-success btn-sm"><i class="ti ti-external-link"></i> Open</a>` : ''}
+        ${isInstructor ? `<button class="btn btn-danger btn-sm" onclick="deleteResource('${r.id}')"><i class="ti ti-trash"></i></button>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function saveResource() {
+  const title = document.getElementById('res-title').value.trim();
+  const desc = document.getElementById('res-desc').value.trim();
+  const module = document.getElementById('res-module').value;
+  const session = document.getElementById('res-session').value;
+  const type = document.getElementById('res-type').value;
+  const url = document.getElementById('res-url').value.trim();
+  if (!title) { alert('Please enter a title.'); return; }
+  resources.push({ id: 'r' + Date.now(), title, description: desc, module, session, type, url });
+  saveData('resources', resources);
+  closeModal('modalResource');
+  ['res-title','res-desc','res-session','res-url'].forEach(id => document.getElementById(id).value = '');
+  renderResources();
+  showToast('Resource added');
+}
+
+function deleteResource(id) {
+  if (!isInstructor) return;
+  resources = resources.filter(r => r.id !== id);
+  saveData('resources', resources);
+  renderResources();
+  showToast('Resource deleted');
+}
+
+// =====================
+// ANNOUNCEMENTS
+// =====================
+function renderAnnouncements() {
+  const list = document.getElementById('announcementsList');
+  if (announcements.length === 0) {
+    list.innerHTML = `<div class="empty-state"><i class="ti ti-speakerphone"></i><p>No announcements yet.</p></div>`;
+    return;
+  }
+  list.innerHTML = [...announcements].reverse().map(a => `
+    <div class="ann-item ${a.priority}">
+      <div class="ann-header">
+        <div>
+          <div class="ann-title">${a.title}</div>
+          <div class="ann-body">${a.body}</div>
+          <div class="ann-footer">
+            <span class="priority-badge ${a.priority}">${a.priority.charAt(0).toUpperCase() + a.priority.slice(1)}</span>
+            ${a.module ? `<span class="tag tag-module">Module ${a.module}</span>` : ''}
+            <span class="ann-date"><i class="ti ti-clock" style="font-size:0.75rem"></i> ${a.date}</span>
+          </div>
+        </div>
+        ${isInstructor ? `<button class="btn btn-danger btn-sm" style="flex-shrink:0" onclick="deleteAnnouncement('${a.id}')"><i class="ti ti-trash"></i></button>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderHomeAnnouncements() {
+  const el = document.getElementById('homeAnnouncementsPreview');
+  const recent = [...announcements].reverse().slice(0, 3);
+  if (recent.length === 0) {
+    el.innerHTML = `<div class="empty-state" style="padding:1.5rem 1rem;"><i class="ti ti-speakerphone"></i><p>No announcements yet.</p></div>`;
+    return;
+  }
+  el.innerHTML = recent.map(a => `
+    <div style="padding:8px 10px;border-radius:6px;margin-bottom:6px;background:var(--surface2);border-left:3px solid ${a.priority==='urgent'?'var(--danger)':a.priority==='important'?'var(--accent)':'var(--primary)'}">
+      <div style="font-size:0.85rem;font-weight:600;">${a.title}</div>
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;">${a.date}</div>
+    </div>
+  `).join('');
+}
+
+function saveAnnouncement() {
+  const title = document.getElementById('ann-title').value.trim();
+  const body = document.getElementById('ann-body').value.trim();
+  const priority = document.getElementById('ann-priority').value;
+  const module = document.getElementById('ann-module').value;
+  if (!title || !body) { alert('Please fill title and message.'); return; }
+  const now = new Date();
+  const date = now.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  announcements.push({ id: 'a' + Date.now(), title, body, priority, module, date });
+  saveData('announcements', announcements);
+  closeModal('modalAnn');
+  ['ann-title','ann-body'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('ann-priority').value = 'normal';
+  document.getElementById('ann-module').value = '';
+  renderAnnouncements();
+  renderHomeAnnouncements();
+  showToast('Announcement posted');
+}
+
+function deleteAnnouncement(id) {
+  if (!isInstructor) return;
+  announcements = announcements.filter(a => a.id !== id);
+  saveData('announcements', announcements);
+  renderAnnouncements();
+  renderHomeAnnouncements();
+  showToast('Announcement deleted');
+}
+
+// =====================
+// GLOSSARY
+// =====================
+function buildAlphaFilter() {
+  const letters = [...new Set(glossary.map(g => g.term[0].toUpperCase()))].sort();
+  const all = ['All', ...letters];
+  document.getElementById('alphaFilter').innerHTML = all.map(l =>
+    `<button class="alpha-btn ${l === 'All' ? 'active' : ''}" onclick="setAlpha('${l}', this)">${l}</button>`
+  ).join('');
+}
+
+function setAlpha(l, btn) {
+  glossAlphaFilter = l === 'All' ? 'all' : l;
+  document.querySelectorAll('.alpha-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGlossary();
+}
+
+function filterGlossModule(mod, btn) {
+  glossModuleFilter = mod;
+  document.querySelectorAll('[id^="gmod-"]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGlossary();
+}
+
+function renderGlossary() {
+  const search = (document.getElementById('glossSearch').value || '').toLowerCase();
+  let filtered = glossary.filter(g => {
+    const matchSearch = !search || g.term.toLowerCase().includes(search) || g.definition.toLowerCase().includes(search);
+    const matchMod = glossModuleFilter === 'all' || g.module === glossModuleFilter;
+    const matchAlpha = glossAlphaFilter === 'all' || g.term[0].toUpperCase() === glossAlphaFilter;
+    return matchSearch && matchMod && matchAlpha;
+  }).sort((a, b) => a.term.localeCompare(b.term));
+
+  const list = document.getElementById('glossaryList');
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty-state"><i class="ti ti-search-off"></i><p>No terms match your filter.</p></div>`;
+    return;
+  }
+  list.innerHTML = filtered.map(g => `
+    <div class="gloss-item">
+      <div class="gloss-letter">${g.term[0].toUpperCase()}</div>
+      <div class="gloss-content">
+        <div class="gloss-term">${g.term}</div>
+        <div class="gloss-def">${g.definition}</div>
+        <div class="gloss-footer">
+          <span class="tag tag-module">Module ${g.module}</span>
+          ${isInstructor ? `<button class="btn btn-danger btn-sm" onclick="deleteGlossary('${g.id}')"><i class="ti ti-trash"></i></button>` : ''}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function saveGlossaryTerm() {
+  const term = document.getElementById('gloss-term').value.trim();
+  const def = document.getElementById('gloss-def').value.trim();
+  const module = document.getElementById('gloss-module').value;
+  if (!term || !def) { alert('Please fill in the term and definition.'); return; }
+  glossary.push({ id: 'g' + Date.now(), term, definition: def, module });
+  saveData('glossary', glossary);
+  closeModal('modalGloss');
+  ['gloss-term','gloss-def'].forEach(id => document.getElementById(id).value = '');
+  buildAlphaFilter();
+  renderGlossary();
+  showToast('Term added to glossary');
+}
+
+function deleteGlossary(id) {
+  if (!isInstructor) return;
+  glossary = glossary.filter(g => g.id !== id);
+  saveData('glossary', glossary);
+  buildAlphaFilter();
+  renderGlossary();
+  showToast('Term deleted');
+}
+
+// =====================
+// INIT
+// =====================
+function init() {
+  renderModuleContent();
+  renderResources();
+  renderAnnouncements();
+  renderHomeAnnouncements();
+  buildAlphaFilter();
+  renderGlossary();
+  // init gmod-all as active
+  document.getElementById('gmod-all').classList.add('active');
+}
+
+init();
+</script>
+</body>
+</html>
