@@ -1191,10 +1191,69 @@ let resourceFilter = 'all';
 let glossModuleFilter = 'all';
 let glossAlphaFilter = 'all';
 
-function saveData(key, val) { try { localStorage.setItem('sa402_' + key, JSON.stringify(val)); } catch(e) {} }
+const API_URL = 'https://script.google.com/macros/s/AKfycbzBnw6BtSYux5OK9PG0WdT-6Ip5TaaU9aRV8dlDBIlyWG04oyC7zXAe_qldAxW-vpjtjA/exec';
+
+async function apiRead(sheet) {
+  try {
+    const resp = await fetch(`${API_URL}?action=read&sheet=${sheet}`);
+    return await resp.json();
+  } catch(e) { return null; }
+}
+
+async function apiWrite(sheet, rows) {
+  try {
+    await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'write', sheet, rows })
+    });
+  } catch(e) {}
+}
+
+function saveData(key, val) {
+  try { localStorage.setItem('sa402_' + key, JSON.stringify(val)); } catch(e) {}
+}
 
 function loadData(key, fallback) {
   try { const d = localStorage.getItem('sa402_' + key); return d ? JSON.parse(d) : fallback; } catch(e) { return fallback; }
+}
+
+async function syncFromSheets() {
+  showToast('Loading data...');
+  const [sheetResources, sheetAnn, sheetGloss] = await Promise.all([
+    apiRead('Resources'),
+    apiRead('Announcements'),
+    apiRead('Glossary')
+  ]);
+
+  if (sheetResources && Array.isArray(sheetResources)) {
+    const savedIds = new Set(sheetResources.map(r => r.id));
+    const defaults = DEFAULT_RESOURCES.filter(r => !savedIds.has(r.id));
+    resources = [...defaults, ...sheetResources];
+    saveData('resources', sheetResources);
+  }
+
+  if (sheetAnn && Array.isArray(sheetAnn)) {
+    announcements = sheetAnn;
+    saveData('announcements', announcements);
+  }
+
+  if (sheetGloss && Array.isArray(sheetGloss) && sheetGloss.length > 0) {
+    glossary = sheetGloss;
+    saveData('glossary', glossary);
+  }
+
+  renderResources();
+  renderAnnouncements();
+  renderHomeAnnouncements();
+  buildAlphaFilter();
+  renderGlossary();
+  showToast('✓ Data loaded');
+}
+
+async function saveToSheets(sheet, data) {
+  const nonDefault = data.filter(r => !r.id.startsWith('default_'));
+  await apiWrite(sheet, nonDefault);
 }
 
 const DEFAULT_RESOURCES = [
@@ -1436,16 +1495,18 @@ function saveResource() {
   if (!title) { alert('Please enter a title.'); return; }
   resources.push({ id: 'r' + Date.now(), title, description: desc, module, session, type, url });
   saveData('resources', resources);
+  saveToSheets('Resources', resources);
   closeModal('modalResource');
   ['res-title','res-desc','res-session','res-url'].forEach(id => document.getElementById(id).value = '');
   renderResources();
-  showToast('Resource added');
+  showToast('Resource added — saved to Google Sheet');
 }
 
 function deleteResource(id) {
   if (!isInstructor) return;
   resources = resources.filter(r => r.id !== id);
   saveData('resources', resources);
+  saveToSheets('Resources', resources);
   renderResources();
   showToast('Resource deleted');
 }
@@ -1502,19 +1563,21 @@ function saveAnnouncement() {
   const date = now.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
   announcements.push({ id: 'a' + Date.now(), title, body, priority, module, date });
   saveData('announcements', announcements);
+  saveToSheets('Announcements', announcements);
   closeModal('modalAnn');
   ['ann-title','ann-body'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('ann-priority').value = 'normal';
   document.getElementById('ann-module').value = '';
   renderAnnouncements();
   renderHomeAnnouncements();
-  showToast('Announcement posted');
+  showToast('Announcement posted — saved to Google Sheet');
 }
 
 function deleteAnnouncement(id) {
   if (!isInstructor) return;
   announcements = announcements.filter(a => a.id !== id);
   saveData('announcements', announcements);
+  saveToSheets('Announcements', announcements);
   renderAnnouncements();
   renderHomeAnnouncements();
   showToast('Announcement deleted');
@@ -1581,17 +1644,19 @@ function saveGlossaryTerm() {
   if (!term || !def) { alert('Please fill in the term and definition.'); return; }
   glossary.push({ id: 'g' + Date.now(), term, definition: def, module });
   saveData('glossary', glossary);
+  saveToSheets('Glossary', glossary);
   closeModal('modalGloss');
   ['gloss-term','gloss-def'].forEach(id => document.getElementById(id).value = '');
   buildAlphaFilter();
   renderGlossary();
-  showToast('Term added to glossary');
+  showToast('Term added — saved to Google Sheet');
 }
 
 function deleteGlossary(id) {
   if (!isInstructor) return;
   glossary = glossary.filter(g => g.id !== id);
   saveData('glossary', glossary);
+  saveToSheets('Glossary', glossary);
   buildAlphaFilter();
   renderGlossary();
   showToast('Term deleted');
@@ -1607,8 +1672,9 @@ function init() {
   renderHomeAnnouncements();
   buildAlphaFilter();
   renderGlossary();
-  // init gmod-all as active
   document.getElementById('gmod-all').classList.add('active');
+  // Sync from Google Sheets on every load
+  syncFromSheets();
 }
 
 init();
