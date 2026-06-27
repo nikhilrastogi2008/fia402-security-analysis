@@ -274,6 +274,7 @@
   .resource-icon.video { background: #fce8ff; color: #7b1fa2; }
   .resource-icon.article { background: #fff3cd; color: #856404; }
   .resource-icon.case { background: #e8f5e9; color: #2e7d32; }
+  .resource-icon.simulation { background: #ede7f6; color: #5e35b1; }
 
   .resource-meta { flex: 1; }
   .resource-title { font-size: 0.92rem; font-weight: 600; margin-bottom: 3px; }
@@ -721,6 +722,7 @@
         <option value="video">Video</option>
         <option value="article">Article</option>
         <option value="case">Case Study</option>
+        <option value="simulation">Simulation</option>
       </select>
     </div>
     <div class="form-group">
@@ -1131,7 +1133,27 @@ function loadData(key, fallback) {
 }
 function saveData(key, val) { try { localStorage.setItem('sa402_' + key, JSON.stringify(val)); } catch(e) {} }
 
-let resources = loadData('resources', []);
+const DEFAULT_RESOURCES = [
+  {
+    id: 'default_r1',
+    title: 'Trade Cycle Simulation',
+    description: 'Interactive simulation where you play all 5 roles in an Indian securities trade — Investor, Broker, Stock Exchange, Clearing House, and Depository. Submit your score to the instructor on completion.',
+    module: '1',
+    session: '2',
+    type: 'simulation',
+    url: 'https://sanjayfuloria.github.io/trade-cycle-simulation/'
+  }
+];
+
+// Merge default resources with saved ones (avoid duplicates)
+function loadResources() {
+  const saved = loadData('resources', []);
+  const savedIds = new Set(saved.map(r => r.id));
+  const defaults = DEFAULT_RESOURCES.filter(r => !savedIds.has(r.id));
+  return [...defaults, ...saved];
+}
+
+let resources = loadResources();
 let announcements = loadData('announcements', []);
 let glossary = loadData('glossary', null);
 if (!glossary) { glossary = DEFAULT_GLOSSARY; saveData('glossary', glossary); }
@@ -1283,11 +1305,12 @@ const typeIcons = {
   spreadsheet: 'ti-table',
   video: 'ti-player-play',
   article: 'ti-news',
-  case: 'ti-briefcase-2'
+  case: 'ti-briefcase-2',
+  simulation: 'ti-chart-dots'
 };
 const typeLabels = {
   pdf: 'PDF', slide: 'Slide Deck', spreadsheet: 'Spreadsheet',
-  video: 'Video', article: 'Article', case: 'Case Study'
+  video: 'Video', article: 'Article', case: 'Case Study', simulation: 'Simulation'
 };
 const moduleNames = {
   '1': 'Module 1', '2': 'Module 2', '3': 'Module 3', '4': 'Module 4', '5': 'Module 5'
