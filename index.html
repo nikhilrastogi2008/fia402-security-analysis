@@ -1453,7 +1453,7 @@ function filterResources(mod, btn) {
 
 function renderResources() {
   const list = document.getElementById('resourcesList');
-  let filtered = resources.filter(r => resourceFilter === 'all' || r.module === resourceFilter);
+  let filtered = resources.filter(r => resourceFilter === 'all' || String(r.module) === String(resourceFilter));
   if (filtered.length === 0) {
     list.innerHTML = `<div class="empty-state"><i class="ti ti-folder-x"></i><p>No resources yet${resourceFilter !== 'all' ? ' for this module' : ''}. ${isInstructor ? 'Add one above.' : 'Check back later.'}</p></div>`;
     return;
@@ -1607,7 +1607,7 @@ function renderGlossary() {
   const search = (document.getElementById('glossSearch').value || '').toLowerCase();
   let filtered = glossary.filter(g => {
     const matchSearch = !search || g.term.toLowerCase().includes(search) || g.definition.toLowerCase().includes(search);
-    const matchMod = glossModuleFilter === 'all' || g.module === glossModuleFilter;
+    const matchMod = glossModuleFilter === 'all' || String(g.module) === String(glossModuleFilter);
     const matchAlpha = glossAlphaFilter === 'all' || g.term[0].toUpperCase() === glossAlphaFilter;
     return matchSearch && matchMod && matchAlpha;
   }).sort((a, b) => a.term.localeCompare(b.term));
