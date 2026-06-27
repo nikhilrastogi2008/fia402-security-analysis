@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FIA 402 — Security Analysis | IFHE</title>
+<title>FIA 402 — Security Analysis | IMT Hyderabad</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <style>
   :root {
@@ -511,7 +511,7 @@
           <div class="info-item"><div class="info-label">Academic Year</div><div class="info-value">2026-27</div></div>
           <div class="info-item"><div class="info-label">Instructor</div><div class="info-value">Prof. Nikhil Rastogi</div></div>
           <div class="info-item"><div class="info-label">Total Sessions</div><div class="info-value">20 Sessions</div></div>
-          <div class="info-item"><div class="info-label">Institution</div><div class="info-value">IBS Hyderabad, IFHE</div></div>
+          <div class="info-item"><div class="info-label">Institution</div><div class="info-value">IMT Hyderabad</div></div>
         </div>
       </div>
 
@@ -541,13 +541,25 @@
         <div class="card-title"><i class="ti ti-books"></i> Prescribed Textbooks</div>
         <div style="padding:10px 12px;background:var(--surface2);border-radius:6px;margin-bottom:8px;border-left:3px solid var(--primary);">
           <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--primary);margin-bottom:3px;">Primary Textbook</div>
-          <div style="font-size:0.88rem;font-weight:600;">Investments</div>
-          <div style="font-size:0.78rem;color:var(--text-muted);">Bodie, Kane, Marcus &amp; Mohanty</div>
+          <div style="font-size:0.88rem;font-weight:600;">Investments (BKMM)</div>
+          <div style="font-size:0.78rem;color:var(--text-muted);">Bodie, Kane, Marcus &amp; Mohanty · McGraw Hill · 11th Edition</div>
         </div>
-        <div style="padding:10px 12px;background:var(--surface2);border-radius:6px;border-left:3px solid var(--accent);">
-          <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--warn);margin-bottom:3px;">Reference Book</div>
-          <div style="font-size:0.88rem;font-weight:600;">Investment Valuation</div>
-          <div style="font-size:0.78rem;color:var(--text-muted);">Aswath Damodaran</div>
+        <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--warn);margin-bottom:6px;margin-top:10px;">Reference Books</div>
+        <div style="padding:8px 12px;background:var(--surface2);border-radius:6px;margin-bottom:6px;border-left:3px solid var(--accent);">
+          <div style="font-size:0.85rem;font-weight:600;">Investment Valuation (AD)</div>
+          <div style="font-size:0.78rem;color:var(--text-muted);">Aswath Damodaran · Wiley · 3rd Edition</div>
+        </div>
+        <div style="padding:8px 12px;background:var(--surface2);border-radius:6px;margin-bottom:6px;border-left:3px solid var(--accent);">
+          <div style="font-size:0.85rem;font-weight:600;">Business Analysis and Valuation (PHB)</div>
+          <div style="font-size:0.78rem;color:var(--text-muted);">Palepu, Healy &amp; Bernard · Cengage Learning · 3rd Edition</div>
+        </div>
+        <div style="padding:8px 12px;background:var(--surface2);border-radius:6px;margin-bottom:6px;border-left:3px solid var(--accent);">
+          <div style="font-size:0.85rem;font-weight:600;">Corporate Finance</div>
+          <div style="font-size:0.78rem;color:var(--text-muted);">Ross, Westerfield, Jaffe &amp; Kakani · Tata McGraw Hill · 8th Edition</div>
+        </div>
+        <div style="padding:8px 12px;background:var(--surface2);border-radius:6px;border-left:3px solid var(--accent);">
+          <div style="font-size:0.85rem;font-weight:600;">Indian Financial System</div>
+          <div style="font-size:0.78rem;color:var(--text-muted);">Bharti Pathak · Pearson Education · 3rd Edition (2010)</div>
         </div>
       </div>
 
@@ -817,307 +829,358 @@ const MODULES_DATA = [
   {
     id: 1,
     title: "Introduction to Investment Environment",
+    color: "#185FA5",
     sessions: [
       {
         num: 1,
-        title: "Overview of Financial Markets and Investment Process",
+        title: "Role of Markets and Primary Markets",
+        ref: "Chapter 1 (BKMM)",
         topics: [
-          "Financial markets and their role in the economy",
-          "Types of financial instruments: equity, debt, derivatives",
-          "Investment process: return, risk, and trade-offs",
-          "Real vs. financial assets",
-          "Market participants: households, firms, financial intermediaries"
+          "Role of financial markets in an economy",
+          "Modes of raising capital in financial markets",
+          "Primary market mechanisms: IPO, FPO, rights issue, private placement",
+          "SEBI regulations for capital raising",
+          "Investment banking role in primary issuances"
         ],
-        concepts: ["Financial Asset", "Real Asset", "Risk-Return Trade-off", "Financial Intermediary"]
+        concepts: ["Financial Market", "Primary Market", "IPO", "FPO", "SEBI", "Investment Bank"]
       },
       {
         num: 2,
-        title: "Securities Markets and Trading Mechanisms",
+        title: "Structure of Financial Markets",
+        ref: "Chapter 1 (BKMM)",
         topics: [
-          "Primary vs. secondary markets",
-          "Stock exchanges: NSE, BSE, NYSE",
-          "Trading mechanisms: order types, market vs. limit orders",
-          "Short selling and margin trading",
-          "Market indices: construction and interpretation"
+          "Secondary market mechanisms: exchanges (NSE, BSE) and OTC markets",
+          "Market participants: investors, intermediaries, regulators",
+          "Depository system: NSDL and CDSL",
+          "Trading, clearing and settlement process",
+          "Market indices: Nifty 50, Sensex"
         ],
-        concepts: ["Primary Market", "Secondary Market", "Limit Order", "Short Selling", "Market Index"]
+        concepts: ["Secondary Market", "NSE", "BSE", "NSDL", "CDSL", "Market Index", "Settlement"]
       }
     ]
   },
   {
     id: 2,
     title: "Fixed Income Securities",
+    color: "#0F6E56",
     sessions: [
       {
         num: 3,
-        title: "Bond Basics: Features and Pricing",
+        title: "Bond Characteristics and Bond Pricing Concepts",
+        ref: "Chapter 14 (BKMM)",
         topics: [
-          "Bond terminology: face value, coupon, maturity, YTM",
-          "Bond pricing: present value of cash flows",
-          "Relationship between bond price and yield",
-          "Premium, discount, and par bonds",
-          "Clean vs. dirty price; accrued interest"
+          "Bond structure: face value, coupon rate, maturity, indenture",
+          "Types of bonds: G-Secs, SDL, T-Bills, corporate bonds, debentures",
+          "Clean vs dirty price and accrued interest",
+          "Bond pricing as present value of future cash flows",
+          "Premium, discount and par bonds"
         ],
-        concepts: ["Face Value", "Coupon Rate", "Yield to Maturity (YTM)", "Dirty Price", "Par Bond"]
+        concepts: ["Face Value", "Coupon Rate", "Clean Price", "Dirty Price", "Accrued Interest", "Par Bond", "G-Sec"]
       },
       {
         num: 4,
-        title: "Yield Measures and Bond Returns",
+        title: "Yield to Maturity, Yield to Call, Realized Return, Holding Period Return",
+        ref: "Chapter 14 (BKMM)",
         topics: [
-          "Current yield, YTM, yield to call",
-          "Realized compound return vs. YTM",
-          "Holding period return on bonds",
-          "Reinvestment risk and its impact",
-          "Taxation of bond income"
+          "Yield to maturity (YTM) — IRR of bond cash flows",
+          "Yield to call (YTC) for callable bonds",
+          "Current yield vs YTM",
+          "Realized compound return and reinvestment risk",
+          "Holding period return (HPR) computation"
         ],
-        concepts: ["Current Yield", "Yield to Call", "Realized Compound Return", "Reinvestment Risk", "Holding Period Return"]
+        concepts: ["Yield to Maturity (YTM)", "Yield to Call", "Current Yield", "Realized Return", "Holding Period Return", "Reinvestment Risk"]
       },
       {
         num: 5,
-        title: "Bond Price Sensitivity and Duration",
+        title: "Class Exercise — Bond Pricing and Yields",
+        ref: "Chapter 14 (BKMM)",
         topics: [
-          "Inverse relationship: price and yield",
-          "Duration: Macaulay and Modified",
-          "Duration as a measure of interest rate sensitivity",
-          "Price change approximation using duration",
-          "Factors affecting duration: coupon, maturity, YTM"
+          "Numerical problems: computing bond price given YTM",
+          "Computing YTM given market price",
+          "Comparing YTM vs current yield",
+          "Realized return problems with varying reinvestment rates",
+          "Holding period return calculations"
         ],
-        concepts: ["Macaulay Duration", "Modified Duration", "Price-Yield Relationship", "Interest Rate Risk"]
+        concepts: ["Bond Pricing", "YTM Calculation", "Price-Yield Relationship"]
       },
       {
         num: 6,
-        title: "Convexity and Fixed Income Portfolio Strategies",
+        title: "Term Structure of Interest Rates",
+        ref: "Chapter 15 (BKMM)",
         topics: [
-          "Convexity: why duration alone is insufficient",
-          "Price change formula with convexity correction",
-          "Passive strategies: indexing and immunization",
-          "Active bond strategies: riding the yield curve",
-          "Horizon analysis and maturity management"
+          "Spot rates vs par rates vs forward rates",
+          "Bootstrapping the yield curve from par bonds",
+          "Expectations theory of term structure",
+          "Liquidity preference theory",
+          "Market segmentation theory",
+          "Normal, inverted, flat and humped yield curves",
+          "Computing forward rates from spot rates"
         ],
-        concepts: ["Convexity", "Immunization", "Passive Strategy", "Riding the Yield Curve", "Horizon Analysis"]
+        concepts: ["Spot Rate", "Forward Rate", "Yield Curve", "Bootstrapping", "Expectations Theory", "Liquidity Preference Theory"]
       },
       {
         num: 7,
-        title: "Term Structure of Interest Rates",
+        title: "Bond Duration and Convexity",
+        ref: "Chapter 16 (BKMM)",
         topics: [
-          "Yield curve: shapes and interpretation",
-          "Spot rates, forward rates, and their relationship",
-          "Theories: Expectations, Liquidity Preference, Segmentation",
-          "Bootstrapping spot rates from coupon bonds",
-          "Yield curve as economic indicator"
+          "Macaulay duration — weighted average time to cash flows",
+          "Modified duration — % price change per 1% yield change",
+          "Dollar duration (DV01 / PVBP)",
+          "Price approximation using duration",
+          "Convexity as second-order correction to duration",
+          "Portfolio duration management"
         ],
-        concepts: ["Yield Curve", "Spot Rate", "Forward Rate", "Expectations Theory", "Liquidity Preference Theory"]
+        concepts: ["Macaulay Duration", "Modified Duration", "DV01", "Convexity", "Price Sensitivity", "Portfolio Duration"]
       },
       {
         num: 8,
-        title: "Credit Risk and Bond Ratings",
+        title: "Bond Immunisation",
+        ref: "Chapter 16 (BKMM)",
         topics: [
-          "Credit risk: probability of default and recovery",
-          "Bond ratings by CRISIL, ICRA, Moody's, S&P",
-          "Credit spreads and risk premiums",
-          "High-yield (junk) bonds",
-          "Sovereign vs. corporate credit risk"
+          "Interest rate risk: price risk vs reinvestment risk",
+          "Immunisation: matching duration to investment horizon",
+          "Conditions for a fully immunised portfolio",
+          "Cash flow matching as an alternative strategy",
+          "Rebalancing an immunised portfolio over time",
+          "Application: pension funds and insurance companies (LIC, NPS)"
         ],
-        concepts: ["Credit Risk", "Bond Rating", "Credit Spread", "Default Risk", "High-Yield Bond"]
+        concepts: ["Immunisation", "Price Risk", "Reinvestment Risk", "Cash Flow Matching", "Investment Horizon", "Liability-Driven Investing"]
       },
       {
         num: 9,
-        title: "Advanced Fixed Income Instruments",
+        title: "Class Exercise — Duration, Convexity and Immunisation",
+        ref: "Chapter 16 (BKMM)",
         topics: [
-          "Callable and putable bonds: embedded options",
-          "Convertible bonds and their valuation",
-          "Inflation-indexed bonds (TIPS, IIBs)",
-          "Mortgage-backed securities (MBS) overview",
-          "Floating rate notes and reference rates"
+          "Numerical problems on Macaulay and modified duration",
+          "Convexity calculation problems",
+          "Price change approximation using duration + convexity",
+          "Immunisation portfolio construction problems",
+          "Practice problems from BKMM Chapter 16"
         ],
-        concepts: ["Callable Bond", "Convertible Bond", "Inflation-Indexed Bond", "Mortgage-Backed Security", "Floating Rate Note"]
+        concepts: ["Duration Calculation", "Convexity Adjustment", "Portfolio Immunisation"]
       }
     ]
   },
   {
     id: 3,
     title: "EIC Analysis",
+    color: "#854F0B",
     sessions: [
       {
         num: 10,
-        title: "Macroeconomic Analysis and Industry Classification",
+        title: "Economic Analysis and Industry Analysis",
+        ref: "Chapter 17 (BKMM) | Case: Ashiana Housing Ltd",
         topics: [
-          "Top-down vs. bottom-up investment approach",
-          "Macroeconomic indicators: GDP, inflation, interest rates",
-          "Business cycle and sector rotation strategy",
+          "Top-down approach: economy → industry → company",
+          "GDP, interest rates, inflation, fiscal policy and equity markets",
+          "Business cycle and sector rotation",
           "Industry analysis: Porter's Five Forces",
-          "PESTLE framework for environmental scanning"
+          "Industry life cycle: pioneering, growth, maturity, decline",
+          "Defensive vs cyclical vs structural industries"
         ],
-        concepts: ["Top-Down Analysis", "Business Cycle", "Sector Rotation", "Porter's Five Forces", "PESTLE"]
+        concepts: ["Top-Down Analysis", "Business Cycle", "Sector Rotation", "Porter's Five Forces", "Industry Life Cycle", "Defensive Industry", "Cyclical Industry"]
       },
       {
         num: 11,
-        title: "Company Analysis and Earnings Quality",
+        title: "Company Analysis",
+        ref: "Chapter 19 (BKMM) | Case: Ashiana Housing Ltd",
         topics: [
-          "Financial statement analysis for equity valuation",
-          "Earnings quality: accruals vs. cash earnings",
-          "DuPont decomposition of ROE",
-          "Competitive advantage and moat analysis",
-          "Management quality and corporate governance"
+          "Qualitative analysis: business model, competitive advantage (moat), management quality",
+          "DuPont decomposition of ROE: profitability × efficiency × leverage",
+          "Earnings quality assessment and red flags",
+          "Common size analysis and trend analysis over 5 years",
+          "Normalising earnings for non-recurring items",
+          "Introduction to Ashiana Housing Ltd case"
         ],
-        concepts: ["Earnings Quality", "DuPont Analysis", "Return on Equity (ROE)", "Economic Moat", "Corporate Governance"]
+        concepts: ["DuPont Analysis", "Return on Equity (ROE)", "Economic Moat", "Earnings Quality", "Common Size Analysis", "Corporate Governance"]
       }
     ]
   },
   {
     id: 4,
     title: "Discounted Cash Flow Valuation",
+    color: "#534AB7",
     sessions: [
       {
         num: 12,
-        title: "Foundations of Equity Valuation",
+        title: "Introduction to Valuation",
+        ref: "Chapter 18 (BKMM) | Chapter 1, 2 (Damodaran)",
         topics: [
-          "Intrinsic value vs. market price",
-          "Absolute vs. relative valuation approaches",
-          "Dividend Discount Model (DDM) framework",
-          "Gordon Growth Model: assumptions and applications",
-          "Multi-stage growth models"
+          "Intrinsic value vs market price — the core premise of security analysis",
+          "Dividend Discount Model (DDM): Gordon Growth Model",
+          "H-model for two-stage dividend growth",
+          "Present value of growth opportunities (PVGO)",
+          "Approaches to valuation: DCF, relative, asset-based"
         ],
-        concepts: ["Intrinsic Value", "Dividend Discount Model (DDM)", "Gordon Growth Model", "Multi-Stage Model", "Constant Growth"]
+        concepts: ["Intrinsic Value", "Dividend Discount Model (DDM)", "Gordon Growth Model", "PVGO", "H-Model"]
       },
       {
         num: 13,
-        title: "Free Cash Flow to Equity (FCFE) Valuation",
+        title: "Estimating Risk Parameters",
+        ref: "Chapter 7, 8 (Damodaran)",
         topics: [
-          "FCFE: definition, calculation, and drivers",
-          "Net income to FCFE: working capital and capex adjustments",
-          "Stable growth FCFE model",
-          "Two-stage and three-stage FCFE models",
-          "When to use FCFE vs. DDM"
+          "Beta estimation: regression of stock vs market index (5-year monthly data)",
+          "Industry beta using 10-company weighted average by sales",
+          "Unlevering and re-levering beta for company-specific D/E",
+          "Equity risk premium (ERP) for India = 8.46% (mature market 5.23% + country risk 2.58%)",
+          "Cost of equity using CAPM: Rf = 6.0% (10-year G-Sec)",
+          "Cost of debt from notes to accounts or comparable yields",
+          "WACC computation using market value weights; marginal tax rate = 35%"
         ],
-        concepts: ["Free Cash Flow to Equity (FCFE)", "Capital Expenditure", "Working Capital", "Two-Stage Model"]
+        concepts: ["Beta", "CAPM", "Equity Risk Premium (ERP)", "Country Risk Premium", "WACC", "Cost of Equity", "Cost of Debt"]
       },
       {
         num: 14,
-        title: "Free Cash Flow to Firm (FCFF) and WACC",
+        title: "Measuring Earnings and Cash Flows (Part 1)",
+        ref: "Chapter 9 (Damodaran)",
         topics: [
-          "FCFF: operating cash flows to all capital providers",
-          "FCFE vs. FCFF: relationship and reconciliation",
-          "Weighted Average Cost of Capital (WACC)",
-          "Terminal value estimation: Gordon Growth and Exit Multiple",
-          "Enterprise value to equity value bridge"
+          "Normalising operating income (EBIT): eliminating finance charges, extraordinary items, non-operating income, minority interest",
+          "R&D capitalisation: expense R&D and amortise over 5 years",
+          "NOPAT = Normalised EBIT × (1 − marginal tax rate)",
+          "Net reinvestment = Acquisitions + Capex + ΔNWC − Depreciation − Amortisation",
+          "Use consolidated financial statements (Capitaline)"
         ],
-        concepts: ["Free Cash Flow to Firm (FCFF)", "WACC", "Enterprise Value", "Terminal Value", "Equity Value"]
+        concepts: ["NOPAT", "Normalised EBIT", "Net Reinvestment", "R&D Capitalisation", "Operating Income", "Consolidated Statements"]
       },
       {
         num: 15,
-        title: "Cost of Equity: CAPM and Alternatives",
+        title: "Measuring Earnings and Cash Flows (Part 2)",
+        ref: "Chapter 10 (Damodaran)",
         topics: [
-          "Capital Asset Pricing Model (CAPM) and beta estimation",
-          "Risk-free rate and equity risk premium",
-          "Fama-French Three-Factor Model",
-          "Country risk premium for emerging markets",
-          "Build-up approach for private firms"
+          "Reinvestment rate = Net Reinvestment / Average NOPAT (cap at 70% if above 90%)",
+          "ROCE = NOPAT / (Debt + Equity) — compute 5-year average",
+          "Sustainable growth rate g = Reinvestment rate × ROCE",
+          "Two-stage FCFF model: 5-year explicit forecast + terminal value",
+          "Terminal value: g = 5% from year 6 onwards",
+          "FCFF = NOPAT − Net Reinvestment"
         ],
-        concepts: ["CAPM", "Beta", "Equity Risk Premium (ERP)", "Fama-French Model", "Country Risk Premium"]
+        concepts: ["Reinvestment Rate", "ROCE", "Sustainable Growth Rate", "FCFF", "Two-Stage Model", "Terminal Value"]
       },
       {
         num: 16,
-        title: "Estimating Growth Rates",
+        title: "Measuring Equity Value",
+        ref: "Chapter 16 (Damodaran)",
         topics: [
-          "Historical growth rates: arithmetic vs. geometric mean",
-          "Analyst forecasts and their reliability",
-          "Fundamental growth: retention ratio and ROE",
-          "Sustainable growth rate model",
-          "Decay in growth rates and mean reversion"
+          "Firm value = PV of FCFF (years 1–5) + PV of Terminal Value",
+          "Bridge to equity value: + Cash + Short-term financial investments + Non-operating long-term financial assets",
+          "Deduct: Short-term borrowings + Long-term borrowings + Minority interest",
+          "Equity value per share = Equity value / Number of shares",
+          "Compare to market price and book value per share",
+          "Sensitivity analysis: vary WACC ±100bps and terminal g ±0.5%"
         ],
-        concepts: ["Sustainable Growth Rate", "Retention Ratio", "Plowback Ratio", "Mean Reversion", "ROE-Based Growth"]
+        concepts: ["Equity Value", "Firm Value", "Equity Bridge", "Net Debt", "Minority Interest", "Sensitivity Analysis", "Intrinsic Value per Share"]
       },
       {
         num: 17,
-        title: "DCF Valuation: Sensitivity and Scenario Analysis",
+        title: "Case Analysis / Practitioner Session",
+        ref: "Ashiana Housing Ltd | Capitaline data",
         topics: [
-          "Sensitivity analysis: key value drivers",
-          "Scenario analysis: bull, base, bear cases",
-          "Monte Carlo simulation overview",
-          "Common pitfalls in DCF models",
-          "Reverse DCF: implied growth expectations"
+          "Application of full DCF framework to Ashiana Housing Ltd",
+          "Working through Capitaline financial data: income statement, balance sheet, cash flows",
+          "Computing NOPAT, reinvestment rate, ROCE and growth for Ashiana",
+          "WACC estimation for a real estate company",
+          "Deriving equity value per share and comparing to market price",
+          "Practitioner insights on DCF application in Indian markets"
         ],
-        concepts: ["Sensitivity Analysis", "Scenario Analysis", "Monte Carlo Simulation", "Reverse DCF", "Value Driver"]
+        concepts: ["Ashiana Housing", "Real Estate Valuation", "Capitaline", "DCF Application", "Practitioner Insights"]
       },
       {
         num: 18,
-        title: "Valuation of Special Cases",
+        title: "Student Project Presentations",
+        ref: "Project guidelines (see course handout annexure)",
         topics: [
-          "Valuing high-growth and loss-making firms",
-          "Cyclical and commodity companies",
-          "Financial services firms: challenges and approaches",
-          "Startups and young companies: probability of failure",
-          "Valuing firms with negative book equity"
+          "Group presentations: DCF valuation of chosen company",
+          "Industry analysis, company analysis and DCF walkthrough",
+          "Peer Q&A and instructor evaluation",
+          "Common errors in student DCF models",
+          "Discussion of assumptions, sensitivity and investment recommendation"
         ],
-        concepts: ["High-Growth Firm", "Cyclical Valuation", "Financial Services Valuation", "Survival Probability", "Negative Book Equity"]
+        concepts: ["Group Project", "DCF Presentation", "Investment Recommendation", "Valuation Band"]
       }
     ]
   },
   {
     id: 5,
     title: "Relative Valuation",
+    color: "#993556",
     sessions: [
       {
         num: 19,
-        title: "Price Multiples: P/E, P/B, P/S, EV/EBITDA",
+        title: "Value Multiples and Equity Multiples",
+        ref: "Chapter 18 (BKMM) | Chapter 18 (Damodaran)",
         topics: [
-          "Price-to-Earnings (P/E): trailing vs. forward, adjusted",
-          "PEG ratio: adjusting for growth",
-          "Price-to-Book (P/B) and ROE linkage",
-          "Price-to-Sales (P/S) for high-growth firms",
-          "EV/EBITDA: advantages over P/E"
+          "Price multiples: P/B, P/E (trailing and forward), EV/EBITDA, Price/Sales",
+          "Trailing P/E = Price / Total EPS for latest 4 quarters",
+          "Forward P/E = Price / Estimated EPS next year",
+          "Industry-specific multiples (real estate: NAV; banking: P/BV; telecom: EV/subscriber)",
+          "Justified multiples from fundamentals (link to DDM and Gordon model)",
+          "Computing multiples for chosen company over last 5 years using Capitaline"
         ],
-        concepts: ["P/E Ratio", "PEG Ratio", "Price-to-Book (P/B)", "EV/EBITDA", "Price-to-Sales (P/S)"]
+        concepts: ["P/E Ratio", "P/B Ratio", "EV/EBITDA", "Price-to-Sales", "Trailing P/E", "Forward P/E", "Justified Multiple"]
       },
       {
         num: 20,
-        title: "Comparable Company Analysis and Valuation Summary",
+        title: "Student Project Presentations",
+        ref: "Project guidelines (see course handout annexure)",
         topics: [
-          "Identifying and selecting comparable companies",
-          "Adjusting multiples for differences in growth and risk",
-          "Transaction multiples in M&A contexts",
-          "Football field chart: triangulating value",
-          "Integrating DCF and relative valuation for investment decisions"
+          "Group presentations: relative valuation of chosen company",
+          "Computing peer group multiples using Capitaline data",
+          "Comparing company multiples to sector medians",
+          "Triangulating DCF intrinsic value with relative valuation",
+          "Final investment recommendation: Buy / Hold / Sell",
+          "Peer Q&A and instructor evaluation"
         ],
-        concepts: ["Comparable Company Analysis (CCA)", "Transaction Multiple", "Football Field Chart", "Valuation Range", "Control Premium"]
+        concepts: ["Comparable Company Analysis", "Peer Group", "Relative Valuation", "Valuation Triangulation", "Buy/Hold/Sell"]
       }
     ]
   }
 ];
 
+
+
 const DEFAULT_GLOSSARY = [
-  { id: 'g1', term: 'Alpha', definition: 'Excess return of an investment relative to the return of a benchmark index.', module: '1' },
-  { id: 'g2', term: 'Beta', definition: 'A measure of a stock\'s volatility relative to the overall market. A beta of 1 means the stock moves with the market.', module: '4' },
-  { id: 'g3', term: 'Bond', definition: 'A fixed-income instrument representing a loan made by an investor to a borrower, typically a corporation or government.', module: '2' },
-  { id: 'g4', term: 'CAPM', definition: 'Capital Asset Pricing Model — describes the relationship between systematic risk and expected return for assets, particularly stocks.', module: '4' },
-  { id: 'g5', term: 'Convexity', definition: 'A measure of the curvature in the relationship between bond prices and yields, used to improve duration-based price sensitivity estimates.', module: '2' },
-  { id: 'g6', term: 'Coupon Rate', definition: 'The annual interest rate paid on a bond, expressed as a percentage of the face value.', module: '2' },
-  { id: 'g7', term: 'Credit Spread', definition: 'The difference in yield between a corporate bond and a comparable government bond of the same maturity, representing credit risk compensation.', module: '2' },
-  { id: 'g8', term: 'DCF', definition: 'Discounted Cash Flow — a valuation method that estimates the value of an investment based on its expected future cash flows discounted to the present.', module: '4' },
-  { id: 'g9', term: 'Duration', definition: 'A measure of the sensitivity of a bond\'s price to changes in interest rates, expressed in years. Macaulay duration is the weighted average time to receive cash flows.', module: '2' },
-  { id: 'g10', term: 'EIC Analysis', definition: 'Economy-Industry-Company framework for top-down fundamental analysis of equity investments.', module: '3' },
-  { id: 'g11', term: 'Enterprise Value', definition: 'Total value of a firm, calculated as market capitalization plus net debt plus minority interest. Represents the value to all capital providers.', module: '4' },
-  { id: 'g12', term: 'EV/EBITDA', definition: 'Enterprise Value to EBITDA ratio — a widely used valuation multiple that allows comparison across firms with different capital structures.', module: '5' },
-  { id: 'g13', term: 'FCFE', definition: 'Free Cash Flow to Equity — cash flow available to equity holders after meeting all financial obligations and reinvestment needs.', module: '4' },
-  { id: 'g14', term: 'FCFF', definition: 'Free Cash Flow to Firm — cash flow available to all capital providers (equity and debt) after meeting operating expenses and reinvestment needs.', module: '4' },
-  { id: 'g15', term: 'Gordon Growth Model', definition: 'A dividend discount model that values a stock as the present value of an infinite series of growing dividends: P = D1 / (r - g).', module: '4' },
-  { id: 'g16', term: 'Immunization', definition: 'A strategy to shield a fixed-income portfolio from interest rate risk by matching the duration of assets and liabilities.', module: '2' },
-  { id: 'g17', term: 'Intrinsic Value', definition: 'The true, inherent value of an asset based on fundamental analysis, independent of its market price.', module: '4' },
-  { id: 'g18', term: 'Market Index', definition: 'A statistical measure reflecting composite value of a selected group of stocks, used to track market performance (e.g., SENSEX, NIFTY 50).', module: '1' },
-  { id: 'g19', term: 'Modified Duration', definition: 'A measure of a bond\'s price sensitivity to a 1% change in yield, calculated as Macaulay Duration divided by (1 + YTM/m).', module: '2' },
-  { id: 'g20', term: 'P/E Ratio', definition: 'Price-to-Earnings ratio — the market price per share divided by earnings per share. A key equity valuation multiple.', module: '5' },
-  { id: 'g21', term: 'PEG Ratio', definition: 'Price/Earnings to Growth ratio — adjusts the P/E ratio for expected earnings growth to identify relatively undervalued growth stocks.', module: '5' },
-  { id: 'g22', term: 'Reinvestment Risk', definition: 'The risk that future cash flows from a bond will be reinvested at a lower rate than the original YTM, reducing total return.', module: '2' },
-  { id: 'g23', term: 'ROE', definition: 'Return on Equity — net income divided by shareholders\' equity; a measure of a company\'s profitability relative to equity capital.', module: '3' },
-  { id: 'g24', term: 'Sector Rotation', definition: 'An investment strategy that shifts capital among different economic sectors based on the stage of the business cycle.', module: '3' },
-  { id: 'g25', term: 'Spot Rate', definition: 'The current interest rate for borrowing or lending money for a specific time period, used in yield curve analysis.', module: '2' },
-  { id: 'g26', term: 'Terminal Value', definition: 'The estimated value of a business beyond the explicit forecast period, typically calculated using a perpetuity growth model or exit multiple.', module: '4' },
-  { id: 'g27', term: 'WACC', definition: 'Weighted Average Cost of Capital — the average rate a company pays for its capital (debt and equity), weighted by their respective proportions.', module: '4' },
-  { id: 'g28', term: 'Yield Curve', definition: 'A graphical plot of interest rates for bonds of equal credit quality but different maturities. Its shape provides insights into economic expectations.', module: '2' },
-  { id: 'g29', term: 'Yield to Maturity', definition: 'The total return expected on a bond if held until it matures, accounting for coupon payments and capital gain/loss. The most comprehensive yield measure.', module: '2' },
-  { id: 'g30', term: 'Short Selling', definition: 'Selling borrowed securities with the intention of repurchasing them at a lower price in the future to profit from a price decline.', module: '1' }
+  { id: 'g1', term: 'Accrued Interest', definition: 'Interest earned on a bond since the last coupon payment but not yet paid. Dirty price = clean price + accrued interest. Buyers pay accrued interest to sellers at transaction.', module: '2' },
+  { id: 'g2', term: 'Beta', definition: 'Measure of a stock\'s systematic risk relative to the market. Estimated by regressing 5-year monthly stock returns vs Nifty. Used in CAPM: Ke = Rf + β × ERP.', module: '4' },
+  { id: 'g3', term: 'Bond Immunisation', definition: 'Strategy protecting a fixed-income portfolio from interest rate risk by matching portfolio Macaulay duration to the investment horizon. Used by pension funds (NPS) and insurers (LIC).', module: '2' },
+  { id: 'g4', term: 'Bootstrapping', definition: 'Method for deriving zero-coupon spot rates sequentially from par bond yields. Each spot rate is solved using previously derived rates and the current par yield.', module: '2' },
+  { id: 'g5', term: 'Business Cycle', definition: 'Recurring pattern of economic expansion and contraction. Sector rotation strategy involves moving into cyclical sectors (materials, industrials) during expansion and defensive sectors (FMCG, pharma) during contraction.', module: '3' },
+  { id: 'g6', term: 'CAPM', definition: 'Capital Asset Pricing Model: Ke = Rf + β × ERP. Rf = 6.0% (10-year G-Sec yield). ERP for India = 8.46% (mature market 5.23% + country risk premium 2.58%).', module: '4' },
+  { id: 'g7', term: 'Clean Price', definition: 'Bond price excluding accrued interest — the price quoted in markets (NSE, Bloomberg). Dirty price = clean price + accrued interest = the amount actually paid at settlement.', module: '2' },
+  { id: 'g8', term: 'Convexity', definition: 'Second-order measure of bond price sensitivity. Full price change ≈ −Duration×Δy + ½×Convexity×(Δy)². Positive for standard bonds — gains from rate fall exceed losses from rate rise of equal magnitude.', module: '2' },
+  { id: 'g9', term: 'Country Risk Premium (CRP)', definition: 'Additional return required by investors for investing in an emerging market vs a developed market. India CRP = 2.58% (based on Baa3 sovereign rating default spread). Part of ERP = 8.46%.', module: '4' },
+  { id: 'g10', term: 'Coupon Rate', definition: 'Annual interest payment as a percentage of face value. A 7% coupon on ₹1,000 bond pays ₹70/year. Fixed for most bonds; resets periodically for floating rate notes (FRNs).', module: '2' },
+  { id: 'g11', term: 'DCF', definition: 'Discounted Cash Flow — valuation method computing PV of projected future cash flows. Uses WACC to discount FCFF (gives firm value) or Ke to discount FCFE/dividends (gives equity value directly).', module: '4' },
+  { id: 'g12', term: 'DDM', definition: 'Dividend Discount Model — values equity as PV of all future dividends. Gordon Growth Model: P = D₁/(Ke−g). H-model handles two-stage growth. Most appropriate for mature dividend-paying companies.', module: '4' },
+  { id: 'g13', term: 'DuPont Analysis', definition: 'ROE = Net profit margin × Asset turnover × Equity multiplier. Decomposes ROE into profitability, efficiency and leverage components. Trend analysis over 5 years reveals quality of earnings.', module: '3' },
+  { id: 'g14', term: 'Duration (Macaulay)', definition: 'Weighted average time to receive a bond\'s cash flows, measured in years. Zero-coupon bond: Macaulay duration = maturity. Higher coupon → lower duration. Used in immunisation.', module: '2' },
+  { id: 'g15', term: 'Duration (Modified)', definition: 'Macaulay duration / (1 + YTM/m). Measures % price change for a 1% yield change. ΔP/P ≈ −Modified duration × Δy. A bond with MD = 6 loses ~6% if rates rise 1%.', module: '2' },
+  { id: 'g16', term: 'DV01', definition: 'Dollar Value of 01 — price change for a 1 basis point (0.01%) yield change. Also called PVBP. DV01 = Modified duration × Dirty price × 0.0001. Key risk metric for fixed income portfolios.', module: '2' },
+  { id: 'g17', term: 'EBIT', definition: 'Earnings Before Interest and Tax — operating income. Normalised EBIT eliminates finance charges, extraordinary items, non-operating income and minority interest. Starting point for NOPAT computation.', module: '4' },
+  { id: 'g18', term: 'Equity Risk Premium (ERP)', definition: 'Additional return required for investing in equities vs the risk-free rate. For India = 8.46%: mature market premium 5.23% + country risk premium 2.58% (Baa3 sovereign rating).', module: '4' },
+  { id: 'g19', term: 'EV/EBITDA', definition: 'Enterprise Value to EBITDA — capital-structure neutral multiple. Better than P/E when comparing firms with different leverage. Compute for 5 years and compare to sector median using Capitaline.', module: '5' },
+  { id: 'g20', term: 'FCFF', definition: 'Free Cash Flow to Firm = NOPAT − Net Reinvestment. Available to all capital providers (equity + debt). Discounted at WACC to get firm value. Equity value = Firm value + Cash + Financial assets − Borrowings − Minority interest.', module: '4' },
+  { id: 'g21', term: 'Forward Rate', definition: 'Implied interest rate for a future period derived from current spot rates. f(1,2) = [(1+s₂)²/(1+s₁)] − 1. Used in yield curve analysis and interest rate derivatives.', module: '2' },
+  { id: 'g22', term: 'G-Sec', definition: 'Government Securities — sovereign bonds issued by the Government of India. Risk-free benchmark for Indian fixed income. 10-year G-Sec yield = 6.0% (used as Rf in CAPM per course guidelines).', module: '2' },
+  { id: 'g23', term: 'Gordon Growth Model', definition: 'P = D₁/(Ke−g). D₁ = next dividend. g = ROE × retention ratio. Ke = CAPM required return. Most appropriate for mature, stable dividend-paying companies. Highly sensitive to g assumption.', module: '4' },
+  { id: 'g24', term: 'H-Model', definition: 'Two-stage DDM variant where growth declines linearly from a high rate to a stable rate. P = [D₀×(1+gL) + D₀×H×(gS−gL)] / (Ke−gL), where H = half-life of high-growth period.', module: '4' },
+  { id: 'g25', term: 'Industry Life Cycle', definition: 'Industries progress through: Pioneering (high growth, losses), Growth (rapid expansion), Maturity (stable growth, consolidation) and Decline (shrinking revenues). Valuation multiples compress as industries mature.', module: '3' },
+  { id: 'g26', term: 'IPO', definition: 'Initial Public Offering — first sale of shares to the public. In India: DRHP → SEBI observations → RHP (with price band) → Prospectus (final). Underwritten by investment banks.', module: '1' },
+  { id: 'g27', term: 'Intrinsic Value', definition: 'PV of all future cash flows an asset will generate, discounted at a risk-adjusted rate. Central concept in security analysis. Margin of safety = (Intrinsic value − Market price) / Intrinsic value.', module: '4' },
+  { id: 'g28', term: 'NOPAT', definition: 'Net Operating Profit After Tax = Normalised EBIT × (1 − marginal tax rate of 35%). Starting point for FCFF computation. Use consolidated statements from Capitaline.', module: '4' },
+  { id: 'g29', term: 'P/E Ratio', definition: 'Price-to-Earnings = Market price / EPS. Trailing P/E = Price / last 4 quarters EPS. Forward P/E = Price / estimated next year EPS. Justified P/E = (1−b)/(Ke−g). Nifty 50 typically 18–22x.', module: '5' },
+  { id: 'g30', term: 'P/B Ratio', definition: 'Price-to-Book = Market price / Book value per share. Justified P/B = (ROE−g)/(Ke−g). Most useful for banks and NBFCs. P/B > 1 justified only when ROE > Ke (value creation).', module: '5' },
+  { id: 'g31', term: 'Porter\'s Five Forces', definition: 'Industry attractiveness framework: (1) Threat of new entrants, (2) Buyer bargaining power, (3) Supplier bargaining power, (4) Threat of substitutes, (5) Competitive rivalry. Low scores on all five → highly profitable industry.', module: '3' },
+  { id: 'g32', term: 'PVGO', definition: 'Present Value of Growth Opportunities = P − E/Ke. Positive when ROE > Ke (firm earns above cost of equity on reinvested earnings). Stock price = No-growth value (E/Ke) + PVGO.', module: '4' },
+  { id: 'g33', term: 'Reinvestment Rate', definition: 'Net Reinvestment / Average NOPAT. If above 90%, cap at 70% for years 1–5 and 30% for terminal value. Drives FCFF: lower reinvestment rate → higher near-term cash flows.', module: '4' },
+  { id: 'g34', term: 'ROCE', definition: 'Return on Capital Employed = NOPAT / (Debt + Equity). Compute 5-year average using Capitaline. Sustainable growth g = Reinvestment rate × ROCE. Central to DCF valuation per Damodaran methodology.', module: '4' },
+  { id: 'g35', term: 'Spot Rate', definition: 'Zero-coupon yield for a specific maturity — the YTM of a zero-coupon bond. Derived from par bond yields via bootstrapping. Used to discount individual cash flows in yield curve analysis.', module: '2' },
+  { id: 'g36', term: 'Terminal Value', definition: 'TV = FCFF₆/(WACC−g), where g = 5% from year 6 onwards per course guidelines. Terminal reinvestment rate = 5% / Average ROCE. TV often represents 60–80% of total firm value.', module: '4' },
+  { id: 'g37', term: 'WACC', definition: 'Weighted Average Cost of Capital = Ke×E/(D+E) + Kd(1−t)×D/(D+E). Discount rate for FCFF. Use market value weights. Marginal tax rate = 35%. India G-Sec Rf = 6.0%, ERP = 8.46%.', module: '4' },
+  { id: 'g38', term: 'Yield Curve', definition: 'Graph of YTM vs maturity for bonds of same credit quality. Normal (upward) reflects liquidity premium and growth expectations. Inverted historically signals recession. India: G-Sec yield curve published by RBI.', module: '2' },
+  { id: 'g39', term: 'YTM', definition: 'Yield to Maturity — IRR of a bond held to maturity. The single discount rate equating PV of all cash flows to market price. Assumes coupons reinvested at same rate throughout bond life.', module: '2' },
+  { id: 'g40', term: 'Yield to Call', definition: 'YTM computed assuming bond is called (redeemed early) at the first call date and call price. More relevant than YTM for callable bonds trading at a premium in a falling interest rate environment.', module: '2' }
 ];
+
 
 // =====================
 // STATE
@@ -1128,10 +1191,11 @@ let resourceFilter = 'all';
 let glossModuleFilter = 'all';
 let glossAlphaFilter = 'all';
 
+function saveData(key, val) { try { localStorage.setItem('sa402_' + key, JSON.stringify(val)); } catch(e) {} }
+
 function loadData(key, fallback) {
   try { const d = localStorage.getItem('sa402_' + key); return d ? JSON.parse(d) : fallback; } catch(e) { return fallback; }
 }
-function saveData(key, val) { try { localStorage.setItem('sa402_' + key, JSON.stringify(val)); } catch(e) {} }
 
 const DEFAULT_RESOURCES = [
   {
@@ -1141,7 +1205,7 @@ const DEFAULT_RESOURCES = [
     module: '1',
     session: '2',
     type: 'simulation',
-    url: 'https://sanjayfuloria.github.io/trade-cycle-simulation/'
+    url: 'https://imtindia-my.sharepoint.com/my?id=%2Fpersonal%2Fnrastogi%5Fimthyderabad%5Fedu%5Fin%2FDocuments%2FFinance%20Courses%2FIAPM%2FSecurity%20Analysis%5F2026%2F1n2%5FIntro%20and%20Markets%2Ftrade%5Fcycle%5Fsimulation%2Ehtml&parent=%2Fpersonal%2Fnrastogi%5Fimthyderabad%5Fedu%5Fin%2FDocuments%2FFinance%20Courses%2FIAPM%2FSecurity%20Analysis%5F2026%2F1n2%5FIntro%20and%20Markets&ga=1'
   }
 ];
 
@@ -1280,6 +1344,7 @@ function renderModuleContent() {
           <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:6px">Key Concepts</div>
           ${s.concepts.map(c => `<span class="concept-tag">${c}</span>`).join('')}
         </div>
+        ${s.ref ? `<hr class="divider"><div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:4px">Reference Material</div><div style="font-size:0.82rem;color:var(--text-muted)">${s.ref}</div>` : ''}
       </div>
     </div>`;
   });
