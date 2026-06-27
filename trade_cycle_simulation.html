@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Trade Cycle — Follow One Trade</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0d0f14;--sur:#151820;--sur2:#1d2130;
+  --bor:#2a2f42;--bor2:#3a4060;
+  --txt:#e8eaf2;--mut:#6b7090;
+  --acc:#f0c060;--ac2:#60c0f0;
+  --grn:#4ecb8d;--red:#e06060;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--txt);font-family:'DM Mono',monospace;min-height:100vh;}
+
+/* ── LOBBY ── */
+#lobby{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem;}
+.logo{font-family:'Fraunces',serif;font-size:40px;font-weight:300;color:var(--acc);margin-bottom:4px;letter-spacing:-1px;}
+.logo em{font-style:italic;color:var(--ac2);}
+.tagline{font-size:11px;color:var(--mut);letter-spacing:.15em;text-transform:uppercase;margin-bottom:2.5rem;}
+.lbox{background:var(--sur);border:1px solid var(--bor);border-radius:8px;padding:2rem;width:100%;max-width:560px;}
+.lbox h2{font-family:'Fraunces',serif;font-weight:300;font-size:20px;margin-bottom:.5rem;}
+.lbox p{font-size:11px;color:var(--mut);line-height:1.7;margin-bottom:1.5rem;}
+.lbl{font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;display:block;}
+input[type=text]{width:100%;background:var(--bg);border:1px solid var(--bor);border-radius:4px;padding:10px 12px;font-family:'DM Mono',monospace;font-size:13px;color:var(--txt);outline:none;margin-bottom:1.4rem;}
+input[type=text]:focus{border-color:var(--acc);}
+.trade-pick{display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem;}
+.tcard{background:var(--bg);border:1px solid var(--bor);border-radius:6px;padding:14px 16px;cursor:pointer;transition:border-color .15s,background .15s;}
+.tcard:hover{border-color:var(--bor2);background:#191c26;}
+.tcard.chosen{border-color:var(--acc);background:rgba(240,192,96,.06);}
+.tcard-title{font-size:12px;font-weight:500;color:var(--txt);margin-bottom:3px;}
+.tcard-desc{font-size:10px;color:var(--mut);line-height:1.5;}
+.start-btn{width:100%;background:var(--acc);color:#0d0f14;font-family:'DM Mono',monospace;font-size:13px;font-weight:500;border:none;border-radius:4px;padding:13px;cursor:pointer;transition:opacity .15s;}
+.start-btn:hover:not([disabled]){opacity:.85;}
+.start-btn[disabled]{opacity:.3;cursor:not-allowed;}
+
+/* ── GAME ── */
+#game{display:none;min-height:100vh;flex-direction:column;}
+
+/* progress bar */
+.progress-bar{background:var(--sur);border-bottom:1px solid var(--bor);padding:0 0 0 0;}
+.progress-steps{display:flex;width:100%;}
+.pstep{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 6px;border-right:1px solid var(--bor);font-size:9px;color:var(--mut);text-align:center;gap:5px;transition:background .3s;}
+.pstep:last-child{border-right:none;}
+.pstep.done{background:rgba(78,203,141,.07);}
+.pstep.active{background:rgba(240,192,96,.07);}
+.pstep.wrong-done{background:rgba(224,96,96,.07);}
+.pstep-icon{font-size:16px;}
+.pstep-label{font-size:9px;line-height:1.3;color:var(--mut);}
+.pstep.done .pstep-label{color:var(--grn);}
+.pstep.active .pstep-label{color:var(--acc);}
+.pstep.wrong-done .pstep-label{color:var(--red);}
+.pstep-status{font-size:8px;padding:1px 6px;border-radius:3px;}
+.pstep.done .pstep-status{background:rgba(78,203,141,.2);color:var(--grn);}
+.pstep.active .pstep-status{background:rgba(240,192,96,.2);color:var(--acc);}
+.pstep.wrong-done .pstep-status{background:rgba(224,96,96,.2);color:var(--red);}
+
+/* role header */
+.role-header{display:flex;align-items:center;justify-content:space-between;padding:10px 24px;background:var(--sur);border-bottom:1px solid var(--bor);}
+.rh-left{display:flex;align-items:center;gap:12px;}
+.rh-badge{font-size:11px;font-weight:500;padding:4px 12px;border-radius:20px;color:#0d0f14;}
+.rh-name{font-size:13px;font-weight:500;color:var(--txt);}
+.rh-trade{font-size:11px;color:var(--mut);}
+.rh-score{font-size:11px;color:var(--mut);}
+.rh-score b{color:var(--acc);}
+
+/* main content */
+.gcontent{max-width:820px;margin:0 auto;padding:1.5rem 1.5rem 3rem;}
+
+/* role intro card */
+.role-intro{border:1px solid var(--bor);border-radius:8px;padding:1.2rem 1.4rem;margin-bottom:1.4rem;display:flex;gap:14px;align-items:flex-start;}
+.ri-icon{font-size:28px;flex-shrink:0;}
+.ri-title{font-family:'Fraunces',serif;font-size:17px;font-weight:300;margin-bottom:4px;}
+.ri-role-desc{font-size:11px;color:var(--mut);line-height:1.6;}
+
+/* incoming card */
+.incoming{border-radius:6px;padding:1rem 1.2rem;margin-bottom:1.2rem;border-left:4px solid var(--ac2);background:rgba(96,192,240,.05);}
+.incoming-label{font-size:9px;color:var(--ac2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px;font-weight:500;}
+.incoming-text{font-size:12px;color:var(--txt);line-height:1.8;}
+
+/* question */
+.question-card{background:var(--sur);border:1px solid var(--bor);border-radius:8px;padding:1.2rem 1.4rem;margin-bottom:1.2rem;}
+.q-label{font-size:9px;color:var(--acc);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;font-weight:500;}
+.q-text{font-size:13px;line-height:1.8;color:var(--txt);}
+
+/* choices */
+.choices{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem;}
+.ch{background:var(--sur);border:1px solid var(--bor);border-radius:6px;padding:12px 16px;cursor:pointer;text-align:left;font-family:'DM Mono',monospace;font-size:12px;color:var(--txt);display:flex;align-items:flex-start;gap:12px;transition:border-color .15s,background .15s;width:100%;line-height:1.6;}
+.ch:hover:not([disabled]){border-color:var(--ac2);background:rgba(96,192,240,.04);}
+.ch[disabled]{cursor:default;}
+.ch.correct{border-color:var(--grn)!important;background:rgba(78,203,141,.06)!important;}
+.ch.wrong{border-color:var(--red)!important;background:rgba(224,96,96,.06)!important;}
+.ch-key{width:22px;height:22px;border-radius:4px;background:var(--sur2);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--mut);flex-shrink:0;margin-top:2px;}
+.ch-text{flex:1;}
+
+/* feedback */
+.feedback{border-radius:6px;padding:1rem 1.2rem;margin-top:.5rem;display:none;}
+.feedback.show{display:block;}
+.fb-verdict{font-size:14px;font-weight:500;margin-bottom:6px;}
+.fb-verdict.ok{color:var(--grn);}
+.fb-verdict.bad{color:var(--red);}
+.fb-explain{font-size:12px;color:var(--mut);line-height:1.8;margin-bottom:10px;}
+.fb-flow{border-radius:5px;padding:10px 14px;font-size:12px;line-height:1.7;border-left:4px solid;}
+.fb-flow.ok{border-color:var(--grn);background:rgba(78,203,141,.06);}
+.fb-flow.bad{border-color:var(--red);background:rgba(224,96,96,.06);}
+.fb-flow-label{font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;}
+.fb-flow.ok .fb-flow-label{color:var(--grn);}
+.fb-flow.bad .fb-flow-label{color:var(--red);}
+.fb-flow-text{color:var(--txt);}
+
+.next-btn{margin-top:1.2rem;background:var(--acc);color:#0d0f14;font-family:'DM Mono',monospace;font-size:13px;font-weight:500;border:none;border-radius:5px;padding:11px 28px;cursor:pointer;display:none;}
+.next-btn.show{display:inline-block;}
+.next-btn:hover{opacity:.85;}
+.retry-btn{margin-top:1.2rem;margin-left:10px;background:transparent;color:var(--ac2);font-family:'DM Mono',monospace;font-size:13px;font-weight:500;border:1px solid var(--ac2);border-radius:5px;padding:11px 24px;cursor:pointer;display:none;}
+.retry-btn:hover{background:rgba(96,192,240,.08);}
+
+/* ── SCORE ── */
+#sscreen{display:none;min-height:100vh;flex-direction:column;align-items:center;justify-content:center;padding:2rem;}
+.sc-logo{font-family:'Fraunces',serif;font-size:34px;font-weight:300;color:var(--acc);margin-bottom:4px;}
+.sc-sub{font-size:11px;color:var(--mut);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2.5rem;}
+.sc-summary{background:var(--sur);border:1px solid var(--bor);border-radius:8px;width:100%;max-width:560px;overflow:hidden;margin-bottom:1.5rem;}
+.sc-row{display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid var(--bor);gap:12px;}
+.sc-row:last-child{border-bottom:none;}
+.sc-row.correct-row{background:rgba(78,203,141,.04);}
+.sc-row.wrong-row{background:rgba(224,96,96,.04);}
+.sc-step-icon{font-size:18px;flex-shrink:0;}
+.sc-step-info{flex:1;}
+.sc-step-role{font-size:10px;color:var(--mut);margin-bottom:2px;}
+.sc-step-flow{font-size:11px;color:var(--txt);line-height:1.5;}
+.sc-pts{font-size:12px;font-weight:500;flex-shrink:0;}
+.sc-pts.ok{color:var(--grn);}
+.sc-pts.bad{color:var(--red);}
+.sc-total{background:var(--sur);border:1px solid var(--bor);border-radius:8px;width:100%;max-width:560px;padding:1.4rem;margin-bottom:1.5rem;}
+.sc-total h3{font-family:'Fraunces',serif;font-size:16px;font-weight:300;color:var(--ac2);margin-bottom:10px;}
+.sc-total p{font-size:11px;color:var(--mut);line-height:1.7;margin-bottom:6px;}
+.sc-score-big{font-size:36px;font-weight:300;font-family:'Fraunces',serif;color:var(--acc);margin-bottom:.5rem;}
+.play-again{background:var(--acc);color:#0d0f14;font-family:'DM Mono',monospace;font-size:13px;font-weight:500;border:none;border-radius:5px;padding:12px 32px;cursor:pointer;margin-top:.5rem;}
+.play-again:hover{opacity:.85;}
+</style>
+</head>
+<body>
+
+<!-- LOBBY -->
+<div id="lobby">
+  <div class="logo">Trade <em>Cycle</em></div>
+  <div class="tagline">Follow one trade through every participant</div>
+  <div class="lbox">
+    <h2>How it works</h2>
+    <p>You will play as all 5 participants in the Indian securities market — Investor, Broker, Stock Exchange, Clearing House, and Depository — one after the other. Every role sees exactly what the previous role passed down. Your decisions carry forward through the entire chain.</p>
+    <label class="lbl" for="pname">Your name</label>
+    <input type="text" id="pname" placeholder="e.g. Arjun Shah" maxlength="40"/>
+    <label class="lbl" for="penroll">Enrollment number</label>
+    <input type="text" id="penroll" placeholder="e.g. 2024MBA042" maxlength="20"/>
+    <label class="lbl">Choose a trade scenario</label>
+    <div class="trade-pick" id="trade-pick"></div>
+    <button class="start-btn" id="start-btn" disabled>Begin simulation</button>
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="game">
+  <div class="progress-bar">
+    <div class="progress-steps" id="progress-steps"></div>
+  </div>
+  <div class="role-header">
+    <div class="rh-left">
+      <div class="rh-badge" id="rh-badge">ROLE</div>
+      <div>
+        <div class="rh-name" id="rh-name">--</div>
+        <div class="rh-trade" id="rh-trade">--</div>
+      </div>
+    </div>
+    <div class="rh-score">Score: <b id="rh-score">0</b></div>
+  </div>
+  <div class="gcontent" id="gcontent"></div>
+</div>
+
+<!-- SCORES -->
+<div id="sscreen">
+  <div class="sc-logo">Trade Complete</div>
+  <div class="sc-sub">Here is how the trade moved through each participant</div>
+  <div class="sc-summary" id="sc-summary"></div>
+  <div class="sc-total" id="sc-total"></div>
+  <button class="play-again" id="submit-btn" style="margin-bottom:10px;">Submit my result to instructor</button>
+  <div id="submit-status" style="display:none;font-size:12px;color:var(--mut);max-width:480px;text-align:center;line-height:1.6;margin-bottom:14px;"></div>
+  <button class="play-again" id="play-again">Try another trade</button>
+</div>
+
+<script>
+/* =========================================================
+   TRADE CYCLE SIMULATION
+   One student plays all 5 roles on the same trade.
+   Correct answers are shuffled (not always option A).
+   ========================================================= */
+
+var GFORM_ID = "1FAIpQLScoPWp5W952ejt-Xx6aOR9bpHIFawXrUVwA2FrUiNeZmy6TsA";
+var GFORM_FIELDS = {
+  name: "entry.1076609064",
+  enrollment: "entry.2084014451",
+  trade: "entry.1920683796",
+  score: "entry.2053175261"
+};
+
+function buildGFormURL() {
+  var trade = curTrade().title.replace(/Trade \d+ . /, "");
+  var max = curTrade().steps.length * 20;
+  var scoreText = ST.score + " / " + max;
+  var params = [
+    GFORM_FIELDS.name + "=" + encodeURIComponent(ST.playerName),
+    GFORM_FIELDS.enrollment + "=" + encodeURIComponent(ST.enrollment),
+    GFORM_FIELDS.trade + "=" + encodeURIComponent(trade),
+    GFORM_FIELDS.score + "=" + encodeURIComponent(scoreText)
+  ];
+  return "https://docs.google.com/forms/d/e/" + GFORM_ID + "/viewform?usp=pp_url&" + params.join("&");
+}
+
+var STEPS = [
+  {id:"investor",     label:"Investor",       color:"#60c0f0"},
+  {id:"broker",       label:"Broker",          color:"#f0c060"},
+  {id:"exchange",     label:"Stock Exchange",  color:"#4ecb8d"},
+  {id:"clearinghouse",label:"Clearing House",  color:"#e06060"},
+  {id:"depository",   label:"Depository",      color:"#b090f0"}
+];
+
+var ROLE_DESC = {
+  investor:"You are the investor. You decide what order type to use, at what price, and when. Everything downstream depends on the instruction you send.",
+  broker:"You are the broker. You receive the investor's order, validate it against SEBI rules and account limits, and decide whether to route it to the exchange.",
+  exchange:"You are the stock exchange (NSE/BSE). A validated order arrives from the broker. You match it using price-time priority and generate a confirmed trade report.",
+  clearinghouse:"You are the clearing house (NSCCL). You receive the exchange's trade report. You guarantee settlement by stepping between buyer and seller, then net all obligations.",
+  depository:"You are the depository (NSDL/CDSL). You receive the clearing house's settlement instruction and execute the final demat transfer of securities."
+};
+
+/*
+  Each question object:
+    roleId, incoming, question,
+    options: [ {text, isCorrect, explanation} ]  -- shuffled so correct is NOT always first
+    explain: why the correct answer is right
+    correctFlow: what gets passed downstream on correct answer
+    wrongFlow: what gets passed downstream on wrong answer
+*/
+
+var TRADES = [
+ {
+  id:"t1",
+  title:"Trade 1 — Vikram needs to buy 200 shares urgently",
+  desc:"Vikram is a retail investor. A positive earnings surprise just dropped for INFOSYS. He needs to buy 200 shares immediately before the price runs away. Follow his market order through the entire chain.",
+  price:1520, qty:200, stock:"INFY",
+  steps:[
+   {
+    roleId:"investor",
+    incoming:"INFOSYS just announced 18% profit growth — well above expectations. The stock is at Rs. 1,520 and moving up fast. You want 200 shares right now. Waiting even 10 minutes could mean paying Rs. 50 more per share. Your account has Rs. 3,20,000 fully available.",
+    question:"You need 200 INFY shares immediately at the best price the market offers right now. Which order type is correct?",
+    options:[
+     {text:"Market order — buy 200 INFY immediately at the best available ask price", isCorrect:true,
+      flow:"Broker receives: MARKET BUY 200 INFY. Execute at best available ask immediately. Account: Rs. 3,20,000 available. No price condition — fill now."},
+     {text:"Limit buy at Rs. 1,520 — only buy if the price stays at exactly Rs. 1,520", isCorrect:false,
+      flow:"Broker receives: LIMIT BUY 200 INFY at Rs. 1,520. Stock is already moving above Rs. 1,520 on strong results. This limit may not fill — the price could reach Rs. 1,560 before your order executes."},
+     {text:"Stop-loss buy at trigger Rs. 1,540 — buy only when price rises above Rs. 1,540", isCorrect:false,
+      flow:"Broker receives: STOP-LOSS BUY at Rs. 1,540. This order activates only when price crosses Rs. 1,540 upward. You would pay Rs. 1,540 or more when the stock is currently available at Rs. 1,520 — a needlessly higher entry."},
+     {text:"Limit buy at Rs. 1,480 — wait for a pullback to a lower price before entering", isCorrect:false,
+      flow:"Broker receives: LIMIT BUY 200 INFY at Rs. 1,480. Stock is rallying on strong results. It is unlikely to fall Rs. 40 right now. This order will probably not execute, and Vikram misses the opportunity entirely."}
+    ],
+    explain:"When speed of execution matters more than exact price — as in a rapidly rising stock on strong news — a market order is the correct tool. It guarantees execution at the best available price right now. A limit order risks missing the move entirely if the price runs past your limit. A stop-loss buy adds cost by waiting for an even higher price. A below-market limit is simply unrealistic during a rally.",
+    correctFlow:"Broker receives: MARKET BUY 200 INFY. Execute at best available ask immediately. Account: Rs. 3,20,000 available. No price condition — fill now.",
+    wrongFlow:"Broker receives an order that either misses the move or enters at a worse price than necessary."
+   },
+   {
+    roleId:"broker",
+    incoming:"You receive: MARKET BUY 200 INFY from Vikram. Account balance: Rs. 3,20,000. INFY is currently at Rs. 1,520. Order value = 200 x Rs. 1,520 = Rs. 3,04,000. You check: Rs. 3,20,000 available — no blocked margin, no pledged amounts. Funds are sufficient.",
+    question:"The market order is valid and funds are confirmed. INFY is rising fast. What do you do?",
+    options:[
+     {text:"Hold the order — wait for the price to stabilise before routing to avoid slippage", isCorrect:false,
+      flow:"Exchange receives nothing for 3 minutes while you wait. INFY rises to Rs. 1,548. When you finally route, Vikram pays Rs. 28 more per share — Rs. 5,600 extra. Delay caused by broker costs the client."},
+     {text:"Route the market buy to NSE immediately — funds confirmed, order valid, no reason to delay", isCorrect:true,
+      flow:"Exchange receives: MARKET BUY 200 INFY. Submitted at 10:02:14. No price restriction — match against the best available asks immediately."},
+     {text:"Convert to a limit buy at Rs. 1,520 to protect Vikram from paying more than the current price", isCorrect:false,
+      flow:"Exchange receives: LIMIT BUY 200 INFY at Rs. 1,520. Stock is already Rs. 1,522. The limit of Rs. 1,520 will not fill immediately — Vikram's market order has been changed without authorisation."},
+     {text:"Split into two orders of 100 each to reduce market impact", isCorrect:false,
+      flow:"Exchange receives: Two MARKET BUY orders of 100 INFY each. Splitting without instruction creates unnecessary complexity and does not reduce market impact for a 200-share order — it is too small to matter."}
+    ],
+    explain:"A market buy order with confirmed funds should be routed immediately. The broker's job is to validate and route — not to second-guess timing or convert order types without the client's instruction. Delaying a market order during a rising stock costs the client real money. Splitting orders of this size serves no purpose.",
+    correctFlow:"Exchange receives: MARKET BUY 200 INFY. Submitted at 10:02:14. No price restriction — match against the best available asks immediately.",
+    wrongFlow:"Exchange receives a delayed, modified, or unnecessarily split order that costs Vikram time or money."
+   },
+   {
+    roleId:"exchange",
+    incoming:"You receive: MARKET BUY 200 INFY. Your order book at 10:02:14 shows the sell side: ASK Rs. 1,522 (80 qty), ASK Rs. 1,524 (90 qty), ASK Rs. 1,527 (150 qty). A market buy takes from the cheapest ask first.",
+    question:"How does the matching engine fill this 200-share market buy from the current order book?",
+    options:[
+     {text:"Fill 80 at Rs. 1,522, then 90 at Rs. 1,524, then 30 at Rs. 1,527 — price-time priority, takes cheapest ask first until order is fully filled", isCorrect:true,
+      flow:"Clearing house receives: Vikram bought 200 INFY — 80 shares at Rs. 1,522 + 90 shares at Rs. 1,524 + 30 shares at Rs. 1,527. Average price Rs. 1,523.65. Total consideration Rs. 3,04,730."},
+     {text:"Fill all 200 at Rs. 1,522 — the buyer's market order should receive the single best available price", isCorrect:false,
+      flow:"Clearing house receives: 200 INFY at Rs. 1,522 = Rs. 3,04,400. But only 80 shares exist at Rs. 1,522. Reporting 200 shares at a price where only 80 exist creates a phantom 120-share trade."},
+     {text:"Hold until a single seller offers all 200 INFY at one price — do not do partial fills for market orders", isCorrect:false,
+      flow:"Clearing house receives nothing. Vikram's market order is queued indefinitely. Market orders must fill immediately against available liquidity — holding them defeats the purpose of a market order entirely."},
+     {text:"Fill 80 at Rs. 1,522 and leave the remaining 120 unfilled — execute only against the best ask level", isCorrect:false,
+      flow:"Clearing house receives: 80 INFY at Rs. 1,522. 120 shares remain unfilled. A market order must fill completely using all available ask levels — stopping at one level leaves the client with an incomplete position."}
+    ],
+    explain:"A market order fills against available asks in price-time priority: cheapest first, then next cheapest, until all shares are filled. 80 at Rs. 1,522, then 90 at Rs. 1,524, then 30 at Rs. 1,527 = 200 total. This is called sweeping the order book. Market orders do not wait for a single price — they accept multiple prices across levels. Partial fills at just one level are incorrect for a market order.",
+    correctFlow:"Clearing house receives: Vikram bought 200 INFY — 80 shares at Rs. 1,522 + 90 shares at Rs. 1,524 + 30 shares at Rs. 1,527. Average price Rs. 1,523.65. Total consideration Rs. 3,04,730.",
+    wrongFlow:"Clearing house receives an incorrect, incomplete, or impossible trade report."
+   },
+   {
+    roleId:"clearinghouse",
+    incoming:"You receive from NSE: Trade confirmation. Buyer's broker (Broker A) bought 200 INFY at average Rs. 1,523.65 = Rs. 3,04,730 payable. Three separate sellers — Seller 1 (80 shares), Seller 2 (90 shares), Seller 3 (30 shares). Today Broker A has 2,800 other trades totalling Rs. 38 crore bought and Rs. 31 crore sold.",
+    question:"Vikram's trade is one of 2,801 trades for Broker A today. What is the correct settlement approach for all of Broker A's obligations?",
+    options:[
+     {text:"Settle each of the 2,801 trades individually — Rs. 38 crore outflow and Rs. 31 crore inflow across 2,801 separate fund movements", isCorrect:false,
+      flow:"Depository receives: 2,801 separate fund movement instructions totalling Rs. 69 crore of gross transfers. Each has a counterparty, a time, and a potential failure point. Operationally unsustainable."},
+     {text:"Multilateral netting — Broker A's net obligation = Rs. 38 crore bought minus Rs. 31 crore sold = Rs. 7 crore net payable, plus net share positions per stock. One instruction per stock per broker.", isCorrect:true,
+      flow:"Depository receives: Broker A owes net Rs. 7 crore cash and is owed net X shares across all stocks. Single clean instruction. Vikram's 200 INFY is included in this net position."},
+     {text:"Net only Vikram's three sub-trades (80+90+30 shares at different prices) into one combined trade confirmation", isCorrect:false,
+      flow:"Depository receives: Vikram's three sub-trades combined, but all 2,798 other trades still require individual settlement. Partial netting misses 99.9% of the efficiency gain."},
+     {text:"Instruct the depository to collect Rs. 3,04,730 from Vikram directly and pay the three sellers without going through broker netting", isCorrect:false,
+      flow:"Depository receives: Direct client-to-seller instruction. This bypasses broker accountability entirely. NSCCL's guarantee becomes meaningless if funds move directly between clients."}
+    ],
+    explain:"Multilateral netting across all of a broker's trades is NSCCL's core function. Broker A bought Rs. 38 crore and sold Rs. 31 crore today — net obligation is just Rs. 7 crore instead of Rs. 69 crore in gross movements. Vikram's Rs. 3,04,730 is absorbed into this net figure. This reduces settlement risk, transaction costs, and operational complexity by an order of magnitude.",
+    correctFlow:"Depository receives: Broker A owes net Rs. 7 crore cash and is owed net X shares across all stocks. Single clean instruction. Vikram's 200 INFY is included in this net position.",
+    wrongFlow:"Depository receives an unnecessarily complex, partial, or incorrectly structured settlement instruction."
+   },
+   {
+    roleId:"depository",
+    incoming:"You receive from NSCCL: Settlement instruction for T+1. Credit 200 INFY to Vikram's demat (NSDL account IN300045-87654321). Source: 80 shares from Seller 1, 90 from Seller 2, 30 from Seller 3 — all three accounts verified free. Vikram's demat is active and PAN-linked. Everything is clean.",
+    question:"Three sellers, three debits, one buyer credit. How do you execute this settlement?",
+    options:[
+     {text:"Debit 80 from Seller 1, 90 from Seller 2, 30 from Seller 3 simultaneously. Credit 200 INFY to Vikram in one transaction. Confirm to NSCCL.", isCorrect:true,
+      flow:"Vikram's demat: +200 INFY on T+1. Three sellers debited. NSCCL notified: settlement complete. Vikram's shares are visible from the next morning."},
+     {text:"Process each seller separately with a 2-hour gap between debits to reduce system load", isCorrect:false,
+      flow:"Seller 1 debited at 8 AM, Seller 2 at 10 AM, Seller 3 at 12 PM. T+1 settlement means all transfers should happen by morning. Staggered debits without instruction delays Vikram's credit and disrupts normal settlement timing."},
+     {text:"Credit Vikram with 80 shares first (from Seller 1), then wait for Seller 2 and Seller 3 to confirm before proceeding", isCorrect:false,
+      flow:"Vikram receives only 80 INFY on T+1. He cannot sell or pledge the remaining 120 shares he paid for. NSCCL's instruction clearly covers all 3 sellers — waiting for separate confirmations is not required."},
+     {text:"Ask Vikram to pay each seller directly before releasing their shares from demat", isCorrect:false,
+      flow:"Settlement process collapses. NSCCL's novation and netting is bypassed. Vikram must now track and pay three strangers directly. This was the pre-clearing house system — exactly what NSCCL was created to replace."}
+    ],
+    explain:"With three clean, free, verified accounts and one clean buyer demat, this is a straightforward multi-seller settlement. You debit all three seller accounts and credit Vikram in a single atomic settlement event on T+1. Staggering, waiting for extra confirmations, or asking clients to pay each other directly all undermine the purpose of a clearing and settlement system.",
+    correctFlow:"Vikram's demat: +200 INFY on T+1. Three sellers debited. NSCCL notified: settlement complete. Vikram's shares are visible from the next morning.",
+    wrongFlow:"Settlement is delayed, partial, or unnecessarily complicated — Vikram cannot use shares he has already paid for."
+   }
+  ]
+ },
+ {
+  id:"t2",
+  title:"Trade 2 — Priya uses a stop-loss to protect her position",
+  desc:"Priya holds 200 RELIND shares bought at Rs. 2,840. Bad news on promoter pledging is circulating. She sets a stop-loss order to limit losses automatically. Follow this through the entire chain when the stop-loss triggers.",
+  price:2840, qty:200, stock:"RELIND",
+  steps:[
+   {
+    roleId:"investor",
+    incoming:"You bought 200 RELIND at Rs. 2,840. The stock is at Rs. 2,830 today. You are hearing unconfirmed rumours about the promoter pledging shares. You want automatic protection — if the stock falls to Rs. 2,780, exit your position. You do not want to watch the screen all day, and you want a price floor of Rs. 2,760 even after triggering.",
+    question:"Which order protects you automatically if RELIND falls to Rs. 2,780, while ensuring you do not sell below Rs. 2,760?",
+    options:[
+     {text:"Limit sell at Rs. 2,780 — sell if a buyer bids Rs. 2,780 or more", isCorrect:false,
+      flow:"Broker receives: LIMIT SELL 200 RELIND at Rs. 2,780. This waits for a buyer at Rs. 2,780. But if the stock gaps down from Rs. 2,810 straight to Rs. 2,755 on bad news, the limit order at Rs. 2,780 will NOT execute — leaving you with no protection."},
+     {text:"Market sell order right now at Rs. 2,830 — exit immediately before any potential fall", isCorrect:false,
+      flow:"Broker receives: MARKET SELL 200 RELIND at Rs. 2,830. You exit today at Rs. 2,830, taking a Rs. 10/share loss immediately. But the rumours are unconfirmed — you want conditional protection, not an immediate exit."},
+     {text:"Stop-loss limit order — trigger Rs. 2,780, limit Rs. 2,760 — dormant until Rs. 2,780, then becomes a limit sell at Rs. 2,760", isCorrect:true,
+      flow:"Broker receives: STOP-LOSS LIMIT SELL 200 RELIND — trigger Rs. 2,780, limit Rs. 2,760. Sits dormant while price is above Rs. 2,780. Activates automatically when RELIND hits Rs. 2,780, becoming a limit sell at Rs. 2,760."},
+     {text:"Stop-loss market order — trigger Rs. 2,780 — becomes a market sell at whatever price exists when triggered", isCorrect:false,
+      flow:"Broker receives: STOP-LOSS MARKET SELL trigger Rs. 2,780. This activates at Rs. 2,780 but then sells at ANY price — if the market gaps to Rs. 2,680 during a panic, you get Rs. 2,680 not Rs. 2,760. No floor protection."}
+    ],
+    explain:"A stop-loss limit order has two prices: trigger (when it activates) and limit (minimum acceptable sell price). Trigger Rs. 2,780 means the order wakes up when RELIND hits Rs. 2,780. Limit Rs. 2,760 means it will only sell at Rs. 2,760 or better — providing a floor. A plain limit sell at Rs. 2,780 does not fire if the stock gaps below Rs. 2,780. A stop-loss market gives no floor. A market sell right now is an immediate unconditional exit, not conditional protection.",
+    correctFlow:"Broker receives: STOP-LOSS LIMIT SELL 200 RELIND — trigger Rs. 2,780, limit Rs. 2,760. Sits dormant while price is above Rs. 2,780. Activates automatically when RELIND hits Rs. 2,780, becoming a limit sell at Rs. 2,760.",
+    wrongFlow:"Broker receives an order that either exits too early, provides no floor, or fails to protect when the stock gaps down."
+   },
+   {
+    roleId:"broker",
+    incoming:"Priya's stop-loss limit order (trigger Rs. 2,780, limit Rs. 2,760) is live in the system. Two days later, at 11:18 AM, confirmed news breaks: promoter pledged 60% of stake. RELIND immediately falls. At 11:19 AM the price touches Rs. 2,780 — trigger hit. The stop-loss activates and becomes: LIMIT SELL 200 RELIND at Rs. 2,760. Current market price: Rs. 2,768. Priya's demat: 200 RELIND, all free.",
+    question:"The stop-loss has triggered. Active order: LIMIT SELL 200 RELIND at Rs. 2,760. Market is at Rs. 2,768 — above the Rs. 2,760 limit. What do you do?",
+    options:[
+     {text:"Route immediately to NSE — Rs. 2,768 is above the Rs. 2,760 limit, so this order can fill right now at the current market price", isCorrect:true,
+      flow:"Exchange receives: LIMIT SELL 200 RELIND at Rs. 2,760. Market is Rs. 2,768 — above the limit. Buyers exist at current price. Order is immediately executable."},
+     {text:"Wait until the market price falls exactly to Rs. 2,760 before routing — only route when the limit price is the market price", isCorrect:false,
+      flow:"Exchange receives nothing. You wait while RELIND falls: Rs. 2,762 ... Rs. 2,755 ... Rs. 2,748. By the time you route at Rs. 2,760, the market is at Rs. 2,745 — below the limit. The order cannot fill. Priya is unprotected."},
+     {text:"Convert to a market sell since the stock is falling fast — ignore the limit and just exit", isCorrect:false,
+      flow:"Exchange receives: MARKET SELL 200 RELIND. Executes at Rs. 2,766. Priya exits near the limit price — but you changed her order type without permission. Broker has violated client instructions and SEBI execution obligations."},
+     {text:"Call Priya to reconfirm before routing — the stop-loss triggered automatically but a human should confirm a sell of this size", isCorrect:false,
+      flow:"Exchange receives nothing while you call. RELIND falls to Rs. 2,741 before Priya answers. Now the limit sell at Rs. 2,760 cannot fill since the market is below it. Stop-loss protection has failed due to broker delay."}
+    ],
+    explain:"A limit sell at Rs. 2,760 means: sell at Rs. 2,760 OR HIGHER. The current market is Rs. 2,768 — buyers exist above the limit, so this order is immediately executable. Route it now. Waiting for the price to reach exactly Rs. 2,760 is wrong — the market is falling and may blow through Rs. 2,760 before you route. Never convert a limit order to market or delay without client authorisation.",
+    correctFlow:"Exchange receives: LIMIT SELL 200 RELIND at Rs. 2,760. Market is Rs. 2,768 — above the limit. Buyers exist at current price. Order is immediately executable.",
+    wrongFlow:"Exchange receives a delayed, modified, or absent order — RELIND falls further, protection fails."
+   },
+   {
+    roleId:"exchange",
+    incoming:"You receive: LIMIT SELL 200 RELIND at Rs. 2,760 at 11:19 AM. Order book buy side: BID Rs. 2,768 (120 qty), BID Rs. 2,763 (100 qty), BID Rs. 2,758 (200 qty). Market is falling. Your 10% lower circuit = Rs. 2,556 (previous close Rs. 2,840 x 0.90). Current price Rs. 2,768 is well above the circuit.",
+    question:"LIMIT SELL 200 shares at Rs. 2,760. Best bids: Rs. 2,768 (120 qty) then Rs. 2,763 (100 qty). Both are above the Rs. 2,760 limit. How do you fill?",
+    options:[
+     {text:"Fill 120 at Rs. 2,768 (best bid), then 80 at Rs. 2,763 (next bid) — both bids are above Rs. 2,760 so both are valid fills", isCorrect:true,
+      flow:"Clearing house receives: Priya sold 120 RELIND at Rs. 2,768 + 80 RELIND at Rs. 2,763. All 200 shares filled. Average Rs. 2,766. Total consideration Rs. 5,53,200."},
+     {text:"Fill all 200 at Rs. 2,768 — give the seller the single best price for the full quantity", isCorrect:false,
+      flow:"Clearing house receives: 200 RELIND at Rs. 2,768. But only 120 shares exist at Rs. 2,768. Matching 200 at this price creates a phantom 80-share trade — impossible."},
+     {text:"Do not fill — a limit sell at Rs. 2,760 when market is Rs. 2,768 is suspicious, the seller is asking less than the market", isCorrect:false,
+      flow:"Clearing house receives nothing. Priya's order is cancelled. This is completely wrong — a limit sell at Rs. 2,760 with market at Rs. 2,768 is normal and valid. Rs. 2,760 is the minimum, not the target."},
+     {text:"Fill 120 at Rs. 2,768 only, then hold remaining 80 — Rs. 2,763 is a worse price and should not be used", isCorrect:false,
+      flow:"Clearing house receives: 120 RELIND at Rs. 2,768. 80 shares unfilled. Rs. 2,763 is above the Rs. 2,760 limit — it is a valid fill that should not be withheld. Priya has 80 unprotected shares."}
+    ],
+    explain:"A limit sell of Rs. 2,760 means sell at Rs. 2,760 or better (higher). Rs. 2,768 and Rs. 2,763 are both above Rs. 2,760 — both are valid fills. Fill 120 at Rs. 2,768 (best bid, all available), then 80 at Rs. 2,763 (next bid) to complete the 200. Rs. 2,758 is below the Rs. 2,760 limit so it cannot be used. All 200 shares fill without touching the circuit limit.",
+    correctFlow:"Clearing house receives: Priya sold 120 RELIND at Rs. 2,768 + 80 RELIND at Rs. 2,763. All 200 shares filled. Average Rs. 2,766. Total consideration Rs. 5,53,200.",
+    wrongFlow:"Clearing house receives a partial, impossible, or incorrectly rejected trade report."
+   },
+   {
+    roleId:"clearinghouse",
+    incoming:"You receive: Priya's broker (Broker P) sold 200 RELIND — Rs. 5,53,200 receivable from buyers. Separately, your real-time risk system flags: Broker Delta holds a large long futures position on RELIND. As RELIND falls, Broker Delta's MTM loss = Rs. 2,10,000. Their margin on file = Rs. 1,80,000. Shortfall = Rs. 30,000.",
+    question:"Priya's equity trade settles normally. But Broker Delta's Rs. 30,000 margin shortfall needs a response. What do you do?",
+    options:[
+     {text:"Issue an immediate margin call — Broker Delta must deposit Rs. 30,000 within 60 minutes or NSCCL squares off their futures position", isCorrect:true,
+      flow:"Depository receives: Settlement instruction for Priya's trade on T+1. Rs. 5,53,200 credited to Broker P's account. Buyer's demat credited. Broker Delta separately meets the margin call within the hour."},
+     {text:"Wait until end of day — RELIND may recover and Rs. 30,000 is small for a large broker", isCorrect:false,
+      flow:"Depository receives Priya's settlement instruction. But RELIND falls another 8% by close. Broker Delta's shortfall grows to Rs. 1,90,000. They default on futures settlement. SGF must cover a preventable failure."},
+     {text:"Use the Settlement Guarantee Fund to top up Broker Delta's Rs. 30,000 shortfall now", isCorrect:false,
+      flow:"SGF used for a routine margin gap of an active, solvent broker. SEBI's rules prohibit this — the SGF is for actual defaults, not live margin calls. Misusing SGF depletes the market's safety net unnecessarily."},
+     {text:"Automatically square off half of Broker Delta's futures position without notice to bring it within margin", isCorrect:false,
+      flow:"Broker Delta's client's position is halved without a margin call notice — a direct violation of SEBI's client protection regulations. Forced square-off without notice is only permitted after a margin call deadline expires."}
+    ],
+    explain:"Margin shortfalls must be addressed immediately — this is non-negotiable in futures markets. Rs. 30,000 today can become Rs. 2,00,000 if RELIND falls further. The SGF is a last resort for actual payment defaults, not a routine buffer. Auto-squaring without notice violates SEBI. The only correct action: immediate margin call, 60-minute deadline, square off if not met.",
+    correctFlow:"Depository receives: Settlement instruction for Priya's trade on T+1. Rs. 5,53,200 credited to Broker P's account. Buyer's demat credited. Broker Delta separately meets the margin call within the hour.",
+    wrongFlow:"Priya's trade settles but a preventable risk at Broker Delta is left unaddressed, growing into a default by close."
+   },
+   {
+    roleId:"depository",
+    incoming:"You receive from NSCCL: Settlement instruction T+1. Debit 200 RELIND from Priya's demat. Source: 120 to one buyer, 80 to another buyer. You check Priya's account: 200 RELIND showing. But 60 of those shares are pledged with HDFC Securities as collateral for a margin funding facility. Free shares = 140. Pledged = 60.",
+    question:"Priya's demat has 140 free shares and 60 pledged. NSCCL instructs transfer of all 200. What do you do?",
+    options:[
+     {text:"Transfer all 200 — NSCCL's settlement instruction overrides any pledge, settlement must complete today", isCorrect:false,
+      flow:"200 RELIND transferred. HDFC Securities' pledged collateral is gone without their consent. They can immediately recall Priya's margin loan. Legal dispute filed against the depository for illegal pledge transfer. SEBI investigation begins."},
+     {text:"Transfer only the 140 free shares. Report 60 shares as short delivery to NSCCL. NSCCL conducts a close-out auction for the remaining 60.", isCorrect:true,
+      flow:"140 RELIND transferred to the two buyers (pro-rated). NSCCL notified: 60-share short delivery from Priya. Close-out auction the next morning: 60 RELIND bought at market and delivered. Priya's broker pays the price difference as penalty."},
+     {text:"Block all 200 shares — do not transfer anything until Priya releases the pledge on all 60 shares", isCorrect:false,
+      flow:"0 shares transferred. Both buyers receive nothing on T+1 though they paid. NSCCL declares 200-share short delivery. The 140 free shares — which could have been transferred — are unnecessarily blocked, harming two innocent buyers."},
+     {text:"Transfer the 140 free shares today and wait 5 days for the pledge on 60 shares to expire naturally", isCorrect:false,
+      flow:"140 shares transferred. But 60-share shortfall is not reported to NSCCL for 5 days. The close-out auction is missed. Buyers are stuck without their complete purchase. NSCCL's settlement timeline is violated."}
+    ],
+    explain:"Pledged shares are legally encumbered under the Depositories Act 1996 — transferring them without HDFC Securities' consent is illegal. Deliver the 140 free shares and immediately flag the 60 as short delivery to NSCCL. NSCCL's close-out auction will source them from the open market the next morning. Blocking all 200 harms innocent buyers. Waiting 5 days violates T+1 norms. Priya's broker bears the penalty for the short delivery.",
+    correctFlow:"140 RELIND transferred to the two buyers (pro-rated). NSCCL notified: 60-share short delivery from Priya. Close-out auction the next morning: 60 RELIND bought at market and delivered. Priya's broker pays the price difference as penalty.",
+    wrongFlow:"Either pledged shares are illegally transferred, innocent buyers are harmed, or the short delivery is not reported in time."
+   }
+  ]
+ },
+ {
+  id:"t3",
+  title:"Trade 3 — Nisha uses a limit order on Budget Day",
+  desc:"The Union Budget is tomorrow. Nisha expects market volatility and wants to buy SBIN shares — but only at a specific price. She places a limit buy order. Follow this through the chain when her limit triggers during a volatile session.",
+  price:780, qty:150, stock:"SBIN",
+  steps:[
+   {
+    roleId:"investor",
+    incoming:"SBIN is at Rs. 800 today. You believe the Budget will cause a brief dip. You want to buy 150 SBIN shares but ONLY if they fall to Rs. 780 or below. You are NOT willing to pay Rs. 800. Your account has Rs. 1,25,000 available. You will wait up to 3 days for the price.",
+    question:"You want 150 SBIN shares, but only at Rs. 780 or lower. You are willing to wait. Which order is correct?",
+    options:[
+     {text:"Market order — buy 150 SBIN immediately at Rs. 800", isCorrect:false,
+      flow:"Broker receives: MARKET BUY 150 SBIN at Rs. 800. Executes immediately at Rs. 800. You pay Rs. 1,20,000 — Rs. 3,000 more than your target. Your price discipline is ignored."},
+     {text:"Limit buy order at Rs. 780 — only execute when SBIN reaches Rs. 780 or lower", isCorrect:true,
+      flow:"Broker receives: LIMIT BUY 150 SBIN at Rs. 780. This enters the exchange order book and waits. Will execute automatically if SBIN touches Rs. 780 or goes lower. No action needed from you."},
+     {text:"Stop-loss sell at Rs. 780 — sell if price falls to Rs. 780", isCorrect:false,
+      flow:"Broker receives: STOP-LOSS SELL 150 SBIN at Rs. 780. This is a sell order — you do not own SBIN yet. Placing a stop-loss sell on shares you do not hold is invalid and will be rejected."},
+     {text:"Limit sell at Rs. 820 — sell at Rs. 820 to profit from a rise, then buy back lower", isCorrect:false,
+      flow:"Broker receives: LIMIT SELL 150 SBIN at Rs. 820. You do not own SBIN — you cannot place a sell order for shares you do not hold without a short-selling facility. This order would be rejected."}
+    ],
+    explain:"A limit buy order specifies the maximum price you will pay. By setting it at Rs. 780 (below the current Rs. 800), the order waits in the exchange order book and executes only if a seller offers Rs. 780 or lower. A market order executes immediately at Rs. 800 — ignoring your target. A stop-loss sell and a limit sell both require owning the shares first — you do not yet own SBIN.",
+    correctFlow:"Broker receives: LIMIT BUY 150 SBIN at Rs. 780. This enters the exchange order book and waits. Will execute automatically if SBIN touches Rs. 780 or goes lower. No action needed from you.",
+    wrongFlow:"Broker receives either an immediate buy at the wrong price, or an invalid sell order on shares you do not own."
+   },
+   {
+    roleId:"broker",
+    incoming:"You receive: LIMIT BUY 150 SBIN at Rs. 780 from Nisha. Account balance: Rs. 1,25,000. Order value = 150 x Rs. 780 = Rs. 1,17,000. Funds sufficient. SBIN is currently at Rs. 800 — Rs. 20 above the limit. The order will not execute right now but is valid as a pending order.",
+    question:"Nisha's limit buy is below the current market. Funds are confirmed. What do you do?",
+    options:[
+     {text:"Route the limit order to NSE — a limit buy below the market is valid as a pending order waiting in the order book", isCorrect:true,
+      flow:"Exchange receives: LIMIT BUY 150 SBIN at Rs. 780. Entered into the NSE order book on the bid side. Will match automatically when a seller offers Rs. 780 or lower."},
+     {text:"Reject — a limit buy Rs. 20 below market price is too far from market and unlikely to fill", isCorrect:false,
+      flow:"Exchange receives nothing. Nisha's order is cancelled. The broker has no right to reject valid orders based on their own opinion of whether the limit is achievable. SBIN falls to Rs. 778 the next day — Nisha misses the trade."},
+     {text:"Route it as a market order instead — execute at Rs. 800 now rather than making Nisha wait", isCorrect:false,
+      flow:"Exchange receives: MARKET BUY 150 SBIN at Rs. 800. Nisha pays Rs. 1,20,000 instead of Rs. 1,17,000 — Rs. 3,000 more than she authorised. Broker changed the order type without consent."},
+     {text:"Hold the order and monitor SBIN manually — only route to the exchange when the price actually reaches Rs. 780", isCorrect:false,
+      flow:"Exchange receives the order only after the broker notices the price has moved — possibly several minutes after Rs. 780 is breached. By then, other limit orders in the queue have taken priority. Nisha's order is late due to unnecessary manual intervention."}
+    ],
+    explain:"A limit buy below the current market is a perfectly valid pending order. Route it to the exchange immediately — the exchange's order matching system will handle execution automatically when the price reaches Rs. 780. The broker's job is to validate and route, not to judge whether the limit price is achievable or to monitor manually. Converting to market overrides the client's price discipline without permission.",
+    correctFlow:"Exchange receives: LIMIT BUY 150 SBIN at Rs. 780. Entered into the NSE order book on the bid side. Will match automatically when a seller offers Rs. 780 or lower.",
+    wrongFlow:"Exchange receives nothing, a modified order, or a delayed order — Nisha's price target is missed or overridden."
+   },
+   {
+    roleId:"exchange",
+    incoming:"Nisha's LIMIT BUY 150 SBIN at Rs. 780 has been sitting in the order book. The next day, Budget Day, SBIN falls sharply. At 10:45 AM, a large institutional investor places a MARKET SELL 500 SBIN. Your order book buy side at that moment: BID Rs. 780 (Nisha, 150 qty), BID Rs. 778 (200 qty), BID Rs. 775 (400 qty).",
+    question:"Market sell of 500 SBIN hits your order book. Nisha's limit buy at Rs. 780 is the best bid. How does the matching engine work?",
+    options:[
+     {text:"Fill Nisha's 150 at Rs. 780 (best bid), then 200 at Rs. 778, then 150 at Rs. 775 — price-time priority, market sell sweeps from best bid downward", isCorrect:true,
+      flow:"Clearing house receives: Nisha bought 150 SBIN at Rs. 780. Institutional seller sold 150 at Rs. 780, 200 at Rs. 778, 150 at Rs. 775. Total 500 shares matched across 3 price levels."},
+     {text:"Fill the institutional seller's 500 shares entirely at Rs. 780 — the best available bid price", isCorrect:false,
+      flow:"Clearing house receives: 500 SBIN sold at Rs. 780. But only 150 shares of demand exist at Rs. 780. Matching 500 at Rs. 780 when only 150 exist at that price creates an impossible trade report."},
+     {text:"Do not execute — a market sell into a limit buy creates a price mismatch and requires manual review", isCorrect:false,
+      flow:"Clearing house receives nothing. This is completely wrong — market sell orders match against the best available bids automatically. A limit buy IS a valid bid. There is no mismatch requiring review."},
+     {text:"Fill Nisha's 150 at Rs. 778 (not Rs. 780) — give the buyer a better price than her limit", isCorrect:false,
+      flow:"Clearing house receives: Nisha bought 150 SBIN at Rs. 778. While Rs. 778 is below her limit (which would benefit her), a limit buy executes at the limit price or better — but the best bid price in the book is Rs. 780, which is what Nisha bid. The match is at Rs. 780."}
+    ],
+    explain:"A market sell sweeps from the best bid downward. Nisha's Rs. 780 bid is the best — she buys 150 at Rs. 780 (her limit price). The institutional seller then continues down to Rs. 778 for 200 more, then Rs. 775 for the final 150. This is standard price-time priority. A limit buy executes at the limit price (Rs. 780), not lower — the buyer set the price, so that is the price used. Market sells do not give buyers a discount.",
+    correctFlow:"Clearing house receives: Nisha bought 150 SBIN at Rs. 780. Institutional seller sold 150 at Rs. 780, 200 at Rs. 778, 150 at Rs. 775. Total 500 shares matched across 3 price levels.",
+    wrongFlow:"Clearing house receives an impossible, cancelled, or incorrectly priced trade report."
+   },
+   {
+    roleId:"clearinghouse",
+    incoming:"You receive from NSE: Nisha's broker (Broker N) bought 150 SBIN at Rs. 780 = Rs. 1,17,000 payable. Institutional seller (Broker I) sold 150 SBIN at Rs. 780. Today Broker N has 4,200 other trades. Broker I has 6,800 trades. Without netting, the two brokers would have hundreds of individual fund and share movements between them.",
+    question:"Novation and netting are your two core functions. How do you apply them to Nisha's trade and the rest of today's trades?",
+    options:[
+     {text:"Novation first — NSCCL replaces the Nisha-seller contract with two new contracts (NSCCL as seller to Nisha's broker and buyer to Seller's broker). Then multilateral netting — collapse all obligations into net per broker.", isCorrect:true,
+      flow:"Depository receives: Broker N's net obligation across all 4,201 trades. Single cash and share instruction. Nisha's 150 SBIN is part of the net. Broker I similarly netted. No individual trade instructions."},
+     {text:"Only apply novation — replace buyer-seller contracts with NSCCL but still settle each of the 11,000 trades individually", isCorrect:false,
+      flow:"Depository receives: 11,000 individual settlement instructions. NSCCL guarantees all of them but processes each separately — Rs. 240 crore of gross fund movements instead of a small net figure. Operationally huge."},
+     {text:"Only apply netting — collapse all of Broker N's trades but keep direct buyer-seller contracts without NSCCL stepping in", isCorrect:false,
+      flow:"Depository receives: Net instructions per broker, but without novation. If Broker I defaults, Nisha's broker has no claim against NSCCL — only against Broker I directly. Counterparty risk remains."},
+     {text:"Neither — process each trade bilaterally between the two brokers involved, as each trade has two specific parties", isCorrect:false,
+      flow:"Depository receives: 11,000 bilateral instructions. This is the pre-1990s settlement model. Operational risk, counterparty risk, and fund requirement are all maximised. This is why NSCCL was created."}
+    ],
+    explain:"Novation and netting must both be applied together — they are complementary, not alternatives. Novation eliminates counterparty risk by making NSCCL the guarantor of every trade. Netting eliminates the need for gross settlement by reducing thousands of trades to net obligations per broker. Together they make modern high-volume markets possible. Neither alone is sufficient.",
+    correctFlow:"Depository receives: Broker N's net obligation across all 4,201 trades. Single cash and share instruction. Nisha's 150 SBIN is part of the net. Broker I similarly netted. No individual trade instructions.",
+    wrongFlow:"Depository receives unnecessarily complex, unguaranteed, or grossly inflated settlement instructions."
+   },
+   {
+    roleId:"depository",
+    incoming:"You receive from NSCCL: Settlement instruction T+1. Credit 150 SBIN to Nisha's demat (CDSL account 12034500-12345678). Source: institutional seller's custodian demat (HDFC Custodial Services). You verify: institutional seller has 150 SBIN free and clear. Nisha's demat is valid and active. One issue: Nisha's account uses an old address — her KYC address was updated 3 months ago but the demat records show the old address. Everything else (PAN, bank account, mobile) is current.",
+    question:"Settlement is straightforward but Nisha's demat has a stale address. What do you do?",
+    options:[
+     {text:"Execute the settlement — transfer 150 SBIN to Nisha's demat. Flag the address discrepancy and send Nisha a KYC update notice separately.", isCorrect:true,
+      flow:"Nisha's demat: +150 SBIN credited on T+1. Institutional seller: -150 SBIN debited. NSCCL notified: settlement complete. Nisha receives KYC update notice — update address within 30 days."},
+     {text:"Block the settlement until Nisha updates her address — stale KYC data must be resolved before any demat transfer", isCorrect:false,
+      flow:"0 shares transferred. T+1 deadline missed. Nisha paid Rs. 1,17,000 for shares she cannot receive. NSCCL must issue a short delivery notice for a perfectly valid, clean trade blocked over an address field."},
+     {text:"Credit the shares to Nisha's registered address instead of her demat account — ensure the physical location is current", isCorrect:false,
+      flow:"Securities are electronic — they cannot be sent to a physical address. This instruction makes no sense. Demat transfers are account-to-account, not location-based."},
+     {text:"Transfer to Nisha's broker's pool account and hold until KYC is fully updated", isCorrect:false,
+      flow:"Shares sit in broker's pool account. If broker defaults before KYC is updated, Nisha's shares are at risk. SEBI requires direct client demat credit — pool account holding for administrative reasons is not permitted."}
+    ],
+    explain:"A stale address in a KYC record is an administrative compliance issue — it does not affect the ownership or validity of the trade. The shares legitimately belong to Nisha. Blocking settlement over a mailing address would harm her unfairly and violate T+1 norms. The correct approach is to execute the clean settlement and send a KYC update notice separately, giving Nisha a deadline to update her address. Demat transfers are purely electronic and unrelated to physical addresses.",
+    correctFlow:"Nisha's demat: +150 SBIN credited on T+1. Institutional seller: -150 SBIN debited. NSCCL notified: settlement complete. Nisha receives KYC update notice — update address within 30 days.",
+    wrongFlow:"Settlement is blocked or misdirected over an administrative issue that does not affect the legality or validity of the trade."
+   }
+  ]
+ }
+];
+
+/* ── STATE ── */
+var ST = {
+  playerName:"",
+  enrollment:"",
+  tradeIdx:null,
+  stepIdx:0,
+  results:[],
+  score:0,
+  answered:false,
+  attempts:[]
+};
+
+/* shuffle choices so correct answer is not always first */
+function buildChoices(stepData) {
+  /* Each option: {text, isCorrect, flow} */
+  /* Returns {shuffled:[], correctIdx:int} */
+  var opts = stepData.options.slice(); /* copy */
+  /* Fisher-Yates shuffle */
+  for (var i = opts.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = opts[i]; opts[i] = opts[j]; opts[j] = tmp;
+  }
+  var correctIdx = 0;
+  for (var k = 0; k < opts.length; k++) { if (opts[k].isCorrect) { correctIdx = k; break; } }
+  return {shuffled:opts, correctIdx:correctIdx};
+}
+
+/* We store shuffled choices per step so they don't re-shuffle on re-render */
+var shuffledSteps = [];
+
+function prepareShuffledSteps() {
+  shuffledSteps = [];
+  ST.attempts = [];
+  var trade = TRADES[ST.tradeIdx];
+  for (var i = 0; i < trade.steps.length; i++) {
+    shuffledSteps.push(buildChoices(trade.steps[i]));
+  }
+}
+
+function curTrade(){ return TRADES[ST.tradeIdx]; }
+function curStep(){ return curTrade().steps[ST.stepIdx]; }
+function curShuffled(){ return shuffledSteps[ST.stepIdx]; }
+function roleColor(id){ for(var i=0;i<STEPS.length;i++) if(STEPS[i].id===id) return STEPS[i].color; return "#fff"; }
+function roleLabel(id){ for(var i=0;i<STEPS.length;i++) if(STEPS[i].id===id) return STEPS[i].label; return id; }
+
+/* ── LOBBY ── */
+function initLobby(){
+  var tp = document.getElementById("trade-pick");
+  var h = "";
+  for (var i = 0; i < TRADES.length; i++) {
+    var t = TRADES[i];
+    h += '<div class="tcard" id="tc-'+i+'">';
+    h += '<div class="tcard-title">'+t.title+"</div>";
+    h += '<div class="tcard-desc">'+t.desc+"</div>";
+    h += "</div>";
+  }
+  tp.innerHTML = h;
+  for (var j = 0; j < TRADES.length; j++) {
+    (function(idx){
+      var el = document.getElementById("tc-"+idx);
+      if (el) el.addEventListener("click", function(){
+        ST.tradeIdx = idx;
+        document.querySelectorAll(".tcard").forEach(function(c){ c.classList.remove("chosen"); });
+        el.classList.add("chosen");
+        checkLobby();
+      });
+    })(j);
+  }
+  document.getElementById("pname").addEventListener("input", checkLobby);
+  document.getElementById("penroll").addEventListener("input", checkLobby);
+  document.getElementById("start-btn").addEventListener("click", startGame);
+  document.getElementById("play-again").addEventListener("click", resetToLobby);
+  document.getElementById("submit-btn").addEventListener("click", submitToInstructor);
+}
+
+function checkLobby(){
+  var n = document.getElementById("pname").value.trim();
+  var enroll = document.getElementById("penroll").value.trim();
+  document.getElementById("start-btn").disabled = !(n && enroll && ST.tradeIdx !== null);
+}
+
+function resetToLobby(){
+  ST.tradeIdx = null; ST.enrollment = ""; ST.stepIdx = 0; ST.results = []; ST.score = 0; ST.answered = false; ST.attempts = [];
+  document.querySelectorAll(".tcard").forEach(function(c){ c.classList.remove("chosen"); });
+  document.getElementById("sscreen").style.display = "none";
+  document.getElementById("game").style.display = "none";
+  document.getElementById("lobby").style.display = "flex";
+  checkLobby();
+}
+
+function startGame(){
+  var n = document.getElementById("pname").value.trim();
+  if (!n || ST.tradeIdx === null) return;
+  ST.playerName = n;
+  ST.enrollment = document.getElementById("penroll").value.trim();
+  ST.stepIdx = 0; ST.results = []; ST.score = 0; ST.answered = false; ST.attempts = [];
+  prepareShuffledSteps();
+  document.getElementById("lobby").style.display = "none";
+  document.getElementById("game").style.display = "flex";
+  renderStep();
+}
+
+/* ── PROGRESS ── */
+function renderProgress(){
+  var trade = curTrade();
+  var h = "";
+  for (var i = 0; i < trade.steps.length; i++) {
+    var s = trade.steps[i];
+    var res = ST.results[i] || null;
+    var cls = "pstep";
+    var statusText = "";
+    if (res){ cls += (res.ok?" done":" wrong-done"); statusText = res.ok?"Correct":"Wrong"; }
+    else if (i === ST.stepIdx){ cls += " active"; statusText = "Your turn"; }
+    else { statusText = "Waiting"; }
+    h += '<div class="'+cls+'">';
+    h += '<div class="pstep-icon" style="color:'+roleColor(s.roleId)+'">'+(i+1)+"</div>";
+    h += '<div class="pstep-label">'+roleLabel(s.roleId)+"</div>";
+    if (statusText) h += '<div class="pstep-status">'+statusText+"</div>";
+    h += "</div>";
+  }
+  document.getElementById("progress-steps").innerHTML = h;
+}
+
+function renderHeader(){
+  var step = curStep();
+  var trade = curTrade();
+  var col = roleColor(step.roleId);
+  var badge = document.getElementById("rh-badge");
+  badge.textContent = roleLabel(step.roleId).toUpperCase();
+  badge.style.background = col;
+  document.getElementById("rh-name").textContent = "You are now: " + roleLabel(step.roleId);
+  document.getElementById("rh-trade").textContent = trade.title + "  |  " + ST.playerName + " (" + ST.enrollment + ")";
+  document.getElementById("rh-trade").textContent = trade.title;
+  document.getElementById("rh-score").textContent = ST.score;
+}
+
+/* ── STEP RENDER ── */
+function renderStep(){
+  ST.answered = false;
+  var trade = curTrade();
+  var step = curStep();
+  var shuffled = curShuffled();
+  renderProgress();
+  renderHeader();
+
+  var col = roleColor(step.roleId);
+
+  /* chain summary of previous steps */
+  var chainHtml = "";
+  if (ST.results.length > 0) {
+    chainHtml = '<div style="background:var(--sur);border:1px solid var(--bor);border-radius:8px;padding:1rem 1.2rem;margin-bottom:1.2rem;">';
+    chainHtml += '<div style="font-size:9px;color:var(--mut);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;">Chain so far — what each role passed downstream</div>';
+    for (var i = 0; i < ST.results.length; i++) {
+      var r = ST.results[i];
+      var ps = trade.steps[i];
+      var c = r.ok ? "var(--grn)" : "var(--red)";
+      var bg = r.ok ? "rgba(78,203,141,.05)" : "rgba(224,96,96,.05)";
+      var bord = r.ok ? "var(--grn)" : "var(--red)";
+      chainHtml += '<div style="border:1px solid '+bord+';background:'+bg+';border-radius:5px;padding:8px 12px;margin-bottom:6px;">';
+            var cAtt = r.attempts || 0;
+      var cNet = r.ok ? (20 - cAtt*10) : 0;
+      var cLabel = r.ok ? ("Correct (+20" + (cAtt>0?" - "+cAtt*10+" = "+cNet:"") + " pts)") : "Wrong (0 pts)";
+      chainHtml += '<div style="font-size:9px;color:'+c+';font-weight:500;margin-bottom:3px;">'+roleLabel(ps.roleId)+' — '+cLabel+"</div>";
+      chainHtml += '<div style="font-size:11px;color:var(--txt);line-height:1.6">'+r.flow+"</div>";
+      chainHtml += "</div>";
+    }
+    chainHtml += "</div>";
+  }
+
+  var h = chainHtml;
+
+  /* role intro */
+  h += '<div class="role-intro" style="border-color:'+col+'33;background:'+col+'0A">';
+  h += '<div class="ri-icon" style="color:'+col+'">'+(ST.stepIdx+1)+"</div>";
+  h += '<div><div class="ri-title" style="color:'+col+'">You are now the '+roleLabel(step.roleId)+"</div>";
+  h += '<div class="ri-role-desc">'+ROLE_DESC[step.roleId]+"</div></div></div>";
+
+  /* incoming */
+  h += '<div class="incoming">';
+  h += '<div class="incoming-label">What you receive / your situation</div>';
+  h += '<div class="incoming-text">'+step.incoming+"</div></div>";
+
+  /* question */
+  h += '<div class="question-card">';
+  h += '<div class="q-label">Your decision</div>';
+  h += '<div class="q-text">'+step.question+"</div></div>";
+
+  /* shuffled choices */
+  h += '<div class="choices">';
+  for (var j = 0; j < shuffled.shuffled.length; j++) {
+    h += '<button class="ch" id="ch-'+j+'">';
+    h += '<div class="ch-key">'+String.fromCharCode(65+j)+"</div>";
+    h += '<div class="ch-text">'+shuffled.shuffled[j].text+"</div></button>";
+  }
+  h += "</div>";
+
+  /* feedback */
+  h += '<div class="feedback" id="feedback">';
+  h += '<div class="fb-verdict" id="fb-verdict"></div>';
+  h += '<div class="fb-explain" id="fb-explain"></div>';
+  h += '<div class="fb-flow" id="fb-flow"><div class="fb-flow-label" id="fb-flow-label"></div><div class="fb-flow-text" id="fb-flow-text"></div></div>';
+  h += "</div>";
+
+  var isLast = ST.stepIdx === trade.steps.length - 1;
+  var nextLabel = isLast ? "See trade summary" : "Next: become the "+roleLabel(trade.steps[ST.stepIdx+1].roleId)+" ->";
+  h += '<button class="next-btn" id="next-btn">'+nextLabel+"</button>";
+  h += '<button class="retry-btn" id="retry-btn" style="display:none">Try again &rarr;</button>';
+
+  document.getElementById("gcontent").innerHTML = h;
+
+  for (var k = 0; k < shuffled.shuffled.length; k++) {
+    (function(idx){
+      var btn = document.getElementById("ch-"+idx);
+      if (btn) btn.addEventListener("click", function(){ answer(idx); });
+    })(k);
+  }
+  var nb = document.getElementById("next-btn");
+  if (nb) nb.addEventListener("click", nextStep);
+  var rb = document.getElementById("retry-btn");
+  if (rb) rb.addEventListener("click", retryStep);
+  window.scrollTo(0, 0);
+}
+
+function answer(idx){
+  if (ST.answered) return;
+  var step = curStep();
+  var shuffled = curShuffled();
+  var correct = (idx === shuffled.correctIdx);
+  var chosen = shuffled.shuffled[idx];
+
+  /* disable all buttons while showing feedback */
+  for (var i = 0; i < shuffled.shuffled.length; i++) {
+    var b = document.getElementById("ch-"+i); if (b) b.disabled = true;
+  }
+
+  if (correct) {
+    /* CORRECT — mark, record, show next button */
+    ST.answered = true;
+    var cb = document.getElementById("ch-"+shuffled.correctIdx); if (cb) cb.classList.add("correct");
+    ST.score += 20;
+    document.getElementById("rh-score").textContent = ST.score;
+    var flow = chosen.flow || step.correctFlow;
+    var att = ST.attempts[ST.stepIdx] || 0;
+    ST.results.push({ok:true, flow:flow, role:step.roleId, attempts:att, net: 20 - att*10});
+
+    var fb = document.getElementById("feedback"); if (fb) fb.classList.add("show");
+    var fbv = document.getElementById("fb-verdict");
+    var att2 = ST.attempts[ST.stepIdx] || 0;
+    var netPts2 = 20 - att2*10;
+    var attMsg = att2 > 0 ? " ("+att2+" wrong attempt"+(att2>1?"s":"")+", -"+(att2*10)+" penalty). Net: "+netPts2+" pts" : ".";
+    if (fbv){ fbv.textContent = "Correct — +20 points" + attMsg; fbv.className = "fb-verdict ok"; }
+    var fbe = document.getElementById("fb-explain"); if (fbe) fbe.textContent = step.explain;
+    var fbf = document.getElementById("fb-flow");
+    var fbl = document.getElementById("fb-flow-label");
+    var fbt = document.getElementById("fb-flow-text");
+    if (fbf) fbf.className = "fb-flow ok";
+    if (fbl) fbl.textContent = "What you pass to the next role:";
+    if (fbt) fbt.textContent = flow;
+
+    var nb = document.getElementById("next-btn"); if (nb) nb.classList.add("show");
+    var rb = document.getElementById("retry-btn"); if (rb) rb.style.display = "none";
+
+  } else {
+    /* WRONG — show what went wrong, show retry button, do NOT unlock next */
+    var wb = document.getElementById("ch-"+idx); if (wb) wb.classList.add("wrong");
+
+    var fb = document.getElementById("feedback"); if (fb) fb.classList.add("show");
+    var fbv = document.getElementById("fb-verdict");
+    if (fbv){ fbv.textContent = "Incorrect — 10 points deducted. Read the explanation and try again."; fbv.className = "fb-verdict bad"; }
+    var fbe = document.getElementById("fb-explain"); if (fbe) fbe.textContent = step.explain;
+    var fbf = document.getElementById("fb-flow");
+    var fbl = document.getElementById("fb-flow-label");
+    var fbt = document.getElementById("fb-flow-text");
+    if (fbf) fbf.className = "fb-flow bad";
+    if (fbl) fbl.textContent = "If you had chosen this, the next role would receive:";
+    if (fbt) fbt.textContent = chosen.flow || step.wrongFlow;
+
+    /* deduct 10 for wrong answer */
+    if (!ST.attempts[ST.stepIdx]) ST.attempts[ST.stepIdx] = 0;
+    ST.attempts[ST.stepIdx]++;
+    ST.score -= 10;
+    if (ST.score < 0) ST.score = 0;
+    document.getElementById("rh-score").textContent = ST.score;
+    /* show retry button */
+    var rb = document.getElementById("retry-btn"); if (rb) rb.style.display = "inline-block";
+    /* next button stays hidden */
+  }
+  renderProgress();
+}
+
+function retryStep(){
+  /* re-enable all non-wrong buttons so student can try again */
+  var shuffled = curShuffled();
+  for (var i = 0; i < shuffled.shuffled.length; i++) {
+    var b = document.getElementById("ch-"+i);
+    if (b) {
+      /* only re-enable if not the one they just got wrong */
+      if (!b.classList.contains("wrong")) {
+        b.disabled = false;
+      }
+    }
+  }
+  /* hide feedback */
+  var fb = document.getElementById("feedback"); if (fb) fb.classList.remove("show");
+  var rb = document.getElementById("retry-btn"); if (rb) rb.style.display = "none";
+}
+
+function nextStep(){
+  var trade = curTrade();
+  if (ST.stepIdx < trade.steps.length - 1) {
+    ST.stepIdx++;
+    renderStep();
+  } else {
+    showScores();
+  }
+}
+
+/* ── SCORES ── */
+function showScores(){
+  document.getElementById("game").style.display = "none";
+  document.getElementById("sscreen").style.display = "flex";
+  var trade = curTrade();
+
+  var h = "";
+  for (var i = 0; i < ST.results.length; i++) {
+    var r = ST.results[i];
+    var step = trade.steps[i];
+    var cls = r.ok ? "sc-row correct-row" : "sc-row wrong-row";
+    h += '<div class="'+cls+'">';
+    h += '<div class="sc-step-icon" style="color:'+roleColor(step.roleId)+'">'+(i+1)+"</div>";
+    h += '<div class="sc-step-info">';
+    h += '<div class="sc-step-role">'+roleLabel(step.roleId)+"</div>";
+    h += '<div class="sc-step-flow">'+r.flow+"</div></div>";
+    var rAtt = r.attempts || 0;
+    var rNet = r.ok ? (20 - rAtt*10) : -(rAtt*10);
+    var rNetDisplay = r.ok ? (rAtt > 0 ? "+20 - "+rAtt*10+" = "+rNet : "+20") : (rAtt > 0 ? "-"+rAtt*10 : "0");
+    var rCls = rNet > 0 ? "ok" : (rNet < 0 ? "bad" : "neutral");
+    h += '<div class="sc-pts '+rCls+'">'+rNetDisplay+" pts</div></div>";
+  }
+  document.getElementById("sc-summary").innerHTML = h;
+
+  var maxPossible = curTrade().steps.length * 20;
+  var pct = Math.round(ST.score / maxPossible * 100);
+  var grade = pct >= 80 ? "Excellent — you understand how each role's decision shapes the next" :
+              pct >= 60 ? "Good — review the steps where the chain broke and trace the downstream effect" :
+              pct >= 40 ? "Developing — focus on how what you receive determines what you must pass on" :
+                          "Review needed — re-read the incoming context and the flow result for each step";
+
+  document.getElementById("sc-total").innerHTML =
+    '<div class="sc-score-big">'+ST.score+" / "+(curTrade().steps.length*20)+"</div>"+
+    "<h3>"+ST.playerName+" &nbsp;|&nbsp; <span style='font-size:13px;font-weight:400;color:var(--mut)'>"+ST.enrollment+"</span> — "+grade+"</h3>"+
+    "<p><strong>The key principle:</strong> In a trade cycle, each role does not work in isolation. What the investor sends determines what the broker validates. What the broker routes determines what the exchange matches. What the exchange reports determines what the clearing house guarantees. What the clearing house instructs determines what the depository transfers. A wrong decision does not stay contained — it changes what the next participant receives.</p>"+
+    "<p><strong>Order types used in this simulation:</strong> Market order (execute now at any price), Limit order (execute only at this price or better), Stop-loss limit order (dormant until trigger price, then becomes a limit order), GTC (good till cancelled). Each serves a different investor need and creates a different downstream situation.</p>"+
+    "<p><strong>India context:</strong> T+1 settlement since 2023, NSCCL as clearing corporation, NSDL and CDSL as depositories, SEBI as the statutory regulator.</p>";
+}
+
+function submitToInstructor() {
+  var url = buildGFormURL();
+  window.location.href = url;
+  var status = document.getElementById("submit-status");
+  if (status) {
+    status.style.display = "block";
+    status.innerHTML = "Your details are pre-filled. Click <strong>Submit</strong> on the form to send your result to your instructor. Then press the browser back button to return here.";
+  }
+  var btn = document.getElementById("submit-btn");
+  if (btn) {
+    btn.textContent = "Reopen submission form";
+  }
+}
+
+initLobby();
+</script>
+</body>
+</html>
