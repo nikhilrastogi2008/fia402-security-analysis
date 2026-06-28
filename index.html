@@ -371,6 +371,8 @@
   .btn-sm { padding: 4px 10px; font-size: 0.75rem; }
   .btn-success { background: var(--success-light); color: var(--success); }
   .btn-success:hover { background: var(--success); color: #fff; }
+  .btn-warning { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+  .btn-warning:hover { background: #fcd34d; color: #78350f; }
 
   /* ---- FORM / MODAL ---- */
   .modal-overlay {
@@ -1268,7 +1270,8 @@ const DEFAULT_RESOURCES = [
     module: '1',
     session: '2',
     type: 'simulation',
-    url: 'https://nikhilrastogi2008.github.io/fia402-security-analysis/trade_cycle_simulation.html'
+    url: 'https://nikhilrastogi2008.github.io/fia402-security-analysis/trade_cycle_simulation.html',
+    published: true
   }
 ];
 
@@ -1454,17 +1457,21 @@ function filterResources(mod, btn) {
 function renderResources() {
   const list = document.getElementById('resourcesList');
   let filtered = resources.filter(r => resourceFilter === 'all' || String(r.module) === String(resourceFilter));
+  // Students only see published resources
+  if (!isInstructor) filtered = filtered.filter(r => r.published === undefined || r.published === '' || r.published === true || r.published === 'TRUE');
   if (filtered.length === 0) {
     list.innerHTML = `<div class="empty-state"><i class="ti ti-folder-x"></i><p>No resources yet${resourceFilter !== 'all' ? ' for this module' : ''}. ${isInstructor ? 'Add one above.' : 'Check back later.'}</p></div>`;
     return;
   }
-  list.innerHTML = filtered.map(r => `
-    <div class="resource-item">
+  list.innerHTML = filtered.map(r => {
+    const isPublished = r.published === undefined || r.published === '' || r.published === true || r.published === 'TRUE';
+    return `
+    <div class="resource-item" style="${!isPublished && isInstructor ? 'opacity:0.6;border-left:3px solid var(--warn,#f59e0b)' : ''}">
       <div class="resource-icon ${r.type}">
         <i class="ti ${typeIcons[r.type] || 'ti-file'}"></i>
       </div>
       <div class="resource-meta">
-        <div class="resource-title">${r.title}</div>
+        <div class="resource-title">${r.title} ${!isPublished && isInstructor ? '<span style="font-size:0.7rem;padding:2px 7px;border-radius:20px;background:#fef3c7;color:#92400e;font-weight:600;margin-left:6px">DRAFT</span>' : ''}</div>
         <div class="resource-desc">${r.description || ''}</div>
         <div class="resource-tags">
           <span class="tag tag-module">${moduleNames[r.module] || 'M' + r.module}</span>
@@ -1474,10 +1481,27 @@ function renderResources() {
       </div>
       <div class="resource-actions">
         ${r.url ? `<a href="${r.url}" target="_blank" class="btn btn-success btn-sm"><i class="ti ti-external-link"></i> Open</a>` : ''}
-        ${isInstructor ? `<button class="btn btn-danger btn-sm" onclick="deleteResource('${r.id}')"><i class="ti ti-trash"></i></button>` : ''}
+        ${isInstructor ? `
+          <button class="btn btn-sm ${isPublished ? 'btn-warning' : 'btn-primary'}" onclick="togglePublish('${r.id}')" title="${isPublished ? 'Hide from students' : 'Publish to students'}">
+            <i class="ti ${isPublished ? 'ti-eye-off' : 'ti-eye'}"></i> ${isPublished ? 'Unpublish' : 'Publish'}
+          </button>
+          <button class="btn btn-danger btn-sm" onclick="deleteResource('${r.id}')"><i class="ti ti-trash"></i></button>
+        ` : ''}
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
+}
+
+function togglePublish(id) {
+  if (!isInstructor) return;
+  const r = resources.find(r => r.id === id);
+  if (!r) return;
+  const isPublished = r.published === undefined || r.published === '' || r.published === true || r.published === 'TRUE';
+  r.published = !isPublished;
+  saveData('resources', resources);
+  saveToSheets('Resources', resources);
+  renderResources();
+  showToast(r.published ? '✓ Resource published — students can now see it' : 'Resource unpublished — hidden from students');
 }
 
 function saveResource() {
@@ -1488,13 +1512,14 @@ function saveResource() {
   const type = document.getElementById('res-type').value;
   const url = document.getElementById('res-url').value.trim();
   if (!title) { alert('Please enter a title.'); return; }
-  resources.push({ id: 'r' + Date.now(), title, description: desc, module, session, type, url });
+  // New resources start as Draft by default
+  resources.push({ id: 'r' + Date.now(), title, description: desc, module, session, type, url, published: false });
   saveData('resources', resources);
   saveToSheets('Resources', resources);
   closeModal('modalResource');
   ['res-title','res-desc','res-session','res-url'].forEach(id => document.getElementById(id).value = '');
   renderResources();
-  showToast('Resource added — saved to Google Sheet');
+  showToast('Resource added as Draft — click Publish when ready to share with students');
 }
 
 function deleteResource(id) {
