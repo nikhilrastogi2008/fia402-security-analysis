@@ -1276,7 +1276,7 @@ const DEFAULT_RESOURCES = [
     session: '2',
     type: 'simulation',
     url: 'https://nikhilrastogi2008.github.io/fia402-security-analysis/trade_cycle_simulation.html',
-    published: true
+    published: 'TRUE'
   }
 ];
 
@@ -1459,17 +1459,25 @@ function filterResources(mod, btn) {
   renderResources();
 }
 
+// Helper — Google Sheets returns booleans as strings "TRUE"/"FALSE" or "true"/"false"
+// Only explicitly false values mean unpublished. Anything else = published.
+function isPublishedVal(val) {
+  if (val === false) return false;
+  if (val === 'false' || val === 'FALSE' || val === 'False') return false;
+  return true; // undefined, '', true, 'TRUE', 'true', 'True' all mean published
+}
+
 function renderResources() {
   const list = document.getElementById('resourcesList');
   let filtered = resources.filter(r => resourceFilter === 'all' || String(r.module) === String(resourceFilter));
   // Students only see published resources
-  if (!isInstructor) filtered = filtered.filter(r => r.published === undefined || r.published === '' || r.published === true || r.published === 'TRUE');
+  if (!isInstructor) filtered = filtered.filter(r => isPublishedVal(r.published));
   if (filtered.length === 0) {
     list.innerHTML = `<div class="empty-state"><i class="ti ti-folder-x"></i><p>No resources yet${resourceFilter !== 'all' ? ' for this module' : ''}. ${isInstructor ? 'Add one above.' : 'Check back later.'}</p></div>`;
     return;
   }
   list.innerHTML = filtered.map(r => {
-    const isPublished = r.published === undefined || r.published === '' || r.published === true || r.published === 'TRUE';
+    const isPublished = isPublishedVal(r.published);
     return `
     <div class="resource-item" style="${!isPublished && isInstructor ? 'opacity:0.6;border-left:3px solid var(--warn,#f59e0b)' : ''}">
       <div class="resource-icon ${r.type}">
@@ -1501,8 +1509,8 @@ function togglePublish(id) {
   if (!isInstructor) return;
   const r = resources.find(r => r.id === id);
   if (!r) return;
-  const isPublished = r.published === undefined || r.published === '' || r.published === true || r.published === 'TRUE';
-  r.published = !isPublished;
+  const isPublished = isPublishedVal(r.published);
+  r.published = isPublished ? 'FALSE' : 'TRUE';
   saveData('resources', resources);
   saveToSheets('Resources', resources);
   renderResources();
@@ -1518,7 +1526,7 @@ function saveResource() {
   const url = document.getElementById('res-url').value.trim();
   if (!title) { alert('Please enter a title.'); return; }
   // New resources start as Draft by default
-  resources.push({ id: 'r' + Date.now(), title, description: desc, module, session, type, url, published: false });
+  resources.push({ id: 'r' + Date.now(), title, description: desc, module, session, type, url, published: 'FALSE' });
   saveData('resources', resources);
   saveToSheets('Resources', resources);
   closeModal('modalResource');
