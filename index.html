@@ -1282,13 +1282,13 @@ const DEFAULT_RESOURCES = [
 
 // Merge default resources with saved ones (avoid duplicates)
 function loadResources() {
-  const saved = loadData('resources', []);
-  const savedIds = new Set(saved.map(r => r.id));
-  const defaults = DEFAULT_RESOURCES.filter(r => !savedIds.has(r.id));
-  return [...defaults, ...saved];
+  // Do not use localStorage — always rely on Google Sheet for published state
+  // Show only hardcoded defaults on initial load; syncFromSheets will replace them
+  return [...DEFAULT_RESOURCES];
 }
 
 let resources = loadResources();
+localStorage.removeItem('sa402_resources'); // Always load resources fresh from Google Sheet
 let announcements = loadData('announcements', []);
 let glossary = loadData('glossary', null);
 if (!glossary) { glossary = DEFAULT_GLOSSARY; saveData('glossary', glossary); }
