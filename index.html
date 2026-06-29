@@ -1235,8 +1235,13 @@ async function syncFromSheets() {
   if (sheetResources && Array.isArray(sheetResources)) {
     const savedIds = new Set(sheetResources.map(r => r.id));
     const defaults = DEFAULT_RESOURCES.filter(r => !savedIds.has(r.id));
-    resources = [...defaults, ...sheetResources];
-    saveData('resources', sheetResources);
+    // Sheet version always wins — put sheet first so its published state is used
+    resources = [...sheetResources, ...defaults];
+    // Save defaults to sheet so their published state persists on next toggle
+    if (defaults.length > 0) {
+      await apiWrite('Resources', resources);
+    }
+    saveData('resources', resources);
   }
 
   if (sheetAnn && Array.isArray(sheetAnn)) {
@@ -1258,8 +1263,8 @@ async function syncFromSheets() {
 }
 
 async function saveToSheets(sheet, data) {
-  const nonDefault = data.filter(r => !r.id.startsWith('default_'));
-  await apiWrite(sheet, nonDefault);
+  // Save ALL resources including defaults so published state persists
+  await apiWrite(sheet, data);
 }
 
 const DEFAULT_RESOURCES = [
