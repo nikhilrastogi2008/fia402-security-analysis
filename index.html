@@ -835,7 +835,6 @@ const MODULES_DATA = [
   {
     id: 1,
     title: "Introduction to Investment Environment",
-    learningOutcome: "Understand the role and structure of financial markets in an economy, distinguish between primary and secondary markets, and identify key market participants and regulators.",
     color: "#185FA5",
     sessions: [
       {
@@ -869,7 +868,6 @@ const MODULES_DATA = [
   {
     id: 2,
     title: "Fixed Income Securities",
-    learningOutcome: "Analyse fixed income securities in terms of characteristics, pricing, yield measures, term structure of interest rates, duration, convexity and immunisation strategies.",
     color: "#0F6E56",
     sessions: [
       {
@@ -972,7 +970,6 @@ const MODULES_DATA = [
   {
     id: 3,
     title: "EIC Analysis",
-    learningOutcome: "Understand and apply economic, industry and company analysis as a framework for equity investment decisions, including Porter's Five Forces, industry life cycle and DuPont ROE decomposition.",
     color: "#854F0B",
     sessions: [
       {
@@ -1008,7 +1005,6 @@ const MODULES_DATA = [
   {
     id: 4,
     title: "Discounted Cash Flow Valuation",
-    learningOutcome: "Apply the discounted cash flow method to value companies — estimating risk parameters (WACC, beta, ERP), computing NOPAT and FCFF, building a two-stage DCF model, and deriving equity value per share using the Damodaran framework.",
     color: "#534AB7",
     sessions: [
       {
@@ -1112,7 +1108,6 @@ const MODULES_DATA = [
   {
     id: 5,
     title: "Relative Valuation",
-    learningOutcome: "Apply relative valuation methods to value companies using price multiples (P/E, P/B, EV/EBITDA) and comparable company analysis, and triangulate with DCF to arrive at a well-supported investment recommendation.",
     color: "#993556",
     sessions: [
       {
@@ -1391,14 +1386,13 @@ function selectModule(idx) {
 function renderModuleContent() {
   const m = MODULES_DATA[activeModule];
   let html = `<div class="card" style="margin-bottom:0">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.25rem;">
       <div style="width:40px;height:40px;border-radius:8px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;flex-shrink:0;">${m.id}</div>
       <div>
         <div style="font-size:1.05rem;font-weight:700;color:var(--primary)">${m.title}</div>
         <div style="font-size:0.75rem;color:var(--text-muted)">${m.sessions.length} Session${m.sessions.length>1?'s':''}</div>
       </div>
-    </div>
-    ${m.learningOutcome ? `<div style="background:var(--surface2);border-left:3px solid var(--primary);border-radius:0 6px 6px 0;padding:10px 14px;margin-bottom:1.25rem;"><div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--primary);margin-bottom:4px">Learning Outcome</div><div style="font-size:0.88rem;color:var(--text-secondary);line-height:1.6">${m.learningOutcome}</div></div>` : ''}`;
+    </div>`;
 
   m.sessions.forEach(s => {
     html += `<div class="session-card">
