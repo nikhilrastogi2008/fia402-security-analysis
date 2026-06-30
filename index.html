@@ -835,6 +835,7 @@ const MODULES_DATA = [
   {
     id: 1,
     title: "Introduction to Investment Environment",
+    learningOutcome: "Understand the role and structure of financial markets in an economy, distinguish between primary and secondary markets, and identify key market participants and regulators.",
     color: "#185FA5",
     sessions: [
       {
@@ -868,6 +869,7 @@ const MODULES_DATA = [
   {
     id: 2,
     title: "Fixed Income Securities",
+    learningOutcome: "Analyse fixed income securities in terms of characteristics, pricing, yield measures, term structure of interest rates, duration, convexity and immunisation strategies.",
     color: "#0F6E56",
     sessions: [
       {
@@ -970,6 +972,7 @@ const MODULES_DATA = [
   {
     id: 3,
     title: "EIC Analysis",
+    learningOutcome: "Understand and apply economic, industry and company analysis as a framework for equity investment decisions, including Porter's Five Forces, industry life cycle and DuPont ROE decomposition.",
     color: "#854F0B",
     sessions: [
       {
@@ -1005,6 +1008,7 @@ const MODULES_DATA = [
   {
     id: 4,
     title: "Discounted Cash Flow Valuation",
+    learningOutcome: "Apply the discounted cash flow method to value companies — estimating risk parameters (WACC, beta, ERP), computing NOPAT and FCFF, building a two-stage DCF model, and deriving equity value per share using the Damodaran framework.",
     color: "#534AB7",
     sessions: [
       {
@@ -1108,6 +1112,7 @@ const MODULES_DATA = [
   {
     id: 5,
     title: "Relative Valuation",
+    learningOutcome: "Apply relative valuation methods to value companies using price multiples (P/E, P/B, EV/EBITDA) and comparable company analysis, and triangulate with DCF to arrive at a well-supported investment recommendation.",
     color: "#993556",
     sessions: [
       {
@@ -1184,7 +1189,61 @@ const DEFAULT_GLOSSARY = [
   { id: 'g37', term: 'WACC', definition: 'Weighted Average Cost of Capital = Ke×E/(D+E) + Kd(1−t)×D/(D+E). Discount rate for FCFF. Use market value weights. Marginal tax rate = 35%. India G-Sec Rf = 6.0%, ERP = 8.46%.', module: '4' },
   { id: 'g38', term: 'Yield Curve', definition: 'Graph of YTM vs maturity for bonds of same credit quality. Normal (upward) reflects liquidity premium and growth expectations. Inverted historically signals recession. India: G-Sec yield curve published by RBI.', module: '2' },
   { id: 'g39', term: 'YTM', definition: 'Yield to Maturity — IRR of a bond held to maturity. The single discount rate equating PV of all cash flows to market price. Assumes coupons reinvested at same rate throughout bond life.', module: '2' },
-  { id: 'g40', term: 'Yield to Call', definition: 'YTM computed assuming bond is called (redeemed early) at the first call date and call price. More relevant than YTM for callable bonds trading at a premium in a falling interest rate environment.', module: '2' }
+  { id: 'g40', term: 'Yield to Call', definition: 'YTM computed assuming bond is called (redeemed early) at the first call date and call price. More relevant than YTM for callable bonds trading at a premium in a falling interest rate environment.', module: '2' },
+  { id: 'g41', term: 'Security Analysis', definition: 'Discipline of analysing securities to determine their intrinsic value and investment attractiveness. Founded by Benjamin Graham who wrote "Security Analysis" in 1934. Central principle: margin of safety — buy only when market price is significantly below intrinsic value.', module: '1' },
+  { id: 'g42', term: 'Margin of Safety', definition: 'The most important principle in security analysis (Graham & Dodd). Defined as the difference between intrinsic value and market price. Protects the investor against estimation errors and market uncertainty. Never invest without an adequate margin of safety.', module: '1' },
+  { id: 'g43', term: 'Investment vs Speculation', definition: 'Graham & Dodd: "An investment operation is one which, upon thorough analysis, promises safety of principal and an adequate return. Operations not meeting these requirements are speculative." Speculation is forecasting the psychology of the market (Keynes).', module: '1' },
+  { id: 'g44', term: 'Price Discovery', definition: 'Role of financial markets to aggregate information from all participants and reflect it in securities prices. Example: news of an oil reserve or a corporate scandal is quickly reflected in prices through buy/sell orders. Also called the information role of markets.', module: '1' },
+  { id: 'g45', term: 'Consumption Timing', definition: 'Role of financial markets to allow individuals to store wealth and transfer consumption across time. Example: a 25-year-old saves by investing and draws down savings later. Securities serve as a store of value across different time horizons.', module: '1' },
+  { id: 'g46', term: 'Risk Allocation', definition: 'Role of financial markets to allow investors to choose securities consistent with their risk appetite. A young investor may choose a high-risk biotech stock; a retiree chooses a utility company. Markets enable risk to be distributed to those best able to bear it.', module: '1' },
+  { id: 'g47', term: 'Separation of Ownership and Management', definition: 'Financial markets allow ownership (shareholders) to be separated from management (executives). Enables raising capital from a large pool of investors. However creates agency costs — managers may pursue growth over profitability, misaligning with shareholder interests.', module: '1' },
+  { id: 'g48', term: 'Agency Cost', definition: 'Cost arising from the conflict of interest between owners (shareholders) and managers. Example: a CEO may pursue acquisitions to build a larger empire rather than maximise profitability. Addressed through executive compensation design, board oversight, and corporate governance.', module: '1' },
+  { id: 'g49', term: 'Asset Allocation', definition: 'The first step in the investment process — choice among broad asset classes (equities, bonds, cash, real estate). In top-down investing, asset allocation precedes security selection. Determines the majority of portfolio risk and return.', module: '1' },
+  { id: 'g50', term: 'FPO', definition: 'Follow-on Public Offer — when an already listed company makes a fresh issue of securities to the public or an offer for sale. Differs from IPO in that the company is already publicly listed. Used to raise additional capital post-listing.', module: '1' },
+  { id: 'g51', term: 'Direct Listing', definition: 'Alternative to IPO where a company lists existing shares on an exchange without issuing new shares or raising new capital. Benefits: no dilution, no underwriter fees, market-driven pricing. Examples: Spotify, Coinbase.', module: '1' },
+  { id: 'g52', term: 'QIP', definition: 'Qualified Institutional Placement — a capital raising method where a listed company issues shares to qualified institutional buyers (QIBs) without a public offer. Faster and cheaper than FPO. Regulated by SEBI.', module: '1' },
+  { id: 'g53', term: 'Rights Issue', definition: 'Offer of new shares to existing shareholders in proportion to their current holding, at a discounted price. Shareholders can subscribe or sell their rights. Does not dilute existing shareholders proportionally if they subscribe.', module: '1' },
+  { id: 'g54', term: 'Order Driven Market', definition: 'Market structure where all buy and sell orders are displayed in the order book and executed on price-time priority basis. India\'s NSE and BSE are order driven markets. Transparent — all quotes are visible to all participants.', module: '1' },
+  { id: 'g55', term: 'Quote Driven Market', definition: 'Market structure where a specialist or market maker provides bid/ask quotes and order matching is done between the specialist and investor. Used in forex, G-Sec markets. Less transparent than order driven markets.', module: '1' },
+  { id: 'g56', term: 'Limit Order', definition: 'Order specifying both the price and quantity of securities to buy/sell. Executed only at the specified price or better. Provides price certainty but not execution certainty. Rests in the order book until matched or cancelled.', module: '1' },
+  { id: 'g57', term: 'Market Order', definition: 'Order specifying only the quantity — executed at the best available market price. Guarantees execution but not price. Subject to slippage in thin markets. Used when speed of execution matters more than price.', module: '1' },
+  { id: 'g58', term: 'Stop Loss Order', definition: 'Order triggered when the market price hits a specified level, designed to limit losses. Converts to a market order once the trigger price is reached. Example: buy Reliance at ₹1,800, set stop loss at ₹1,620 to limit loss to 10%.', module: '1' },
+  { id: 'g59', term: 'Circuit Breaker', definition: 'Mechanism to halt trading when a security or index falls/rises beyond a specified threshold. Price bands: 2%, 5%, 10%, or 20% on individual stocks. Index circuit breakers at 10%, 15% and 20%. Designed to curb panic-driven extreme volatility.', module: '1' },
+  { id: 'g60', term: 'Algorithmic Trading', definition: 'Use of computer algorithms to automatically make trading decisions and submit orders. Accounts for ~50-55% of Indian trading volume and ~80-85% in the US. Includes high-frequency trading (HFT) where servers are co-located at exchanges for minimal latency.', module: '1' },
+  { id: 'g61', term: 'Bulk Deal', definition: 'A transaction where total quantity bought/sold exceeds 0.5% of a company\'s equity shares. Executed through normal trading window throughout the day. Disclosed to exchange and made public at end of day.', module: '1' },
+  { id: 'g62', term: 'Block Deal', definition: 'A pre-arranged large transaction of ₹10 crore or more, executed in a special trading window open for ~15 minutes in morning and afternoon sessions. Orders not visible to regular market participants. Negotiated price within 1% of prevailing market price.', module: '1' },
+  { id: 'g63', term: 'Margin Buying', definition: 'Purchasing securities using borrowed funds from the broker, with securities serving as collateral. Margin = % of own funds invested. Broker sets a maintenance margin — if equity falls below it, a margin call is issued requiring additional funds or forced sale of securities.', module: '1' },
+  { id: 'g64', term: 'Short Selling', definition: 'Strategy to profit from a falling stock price: borrow shares and sell them, then buy back at a lower price and return to lender. Requires margin deposit. Dividends paid during the borrowing period must be passed to the lender. Regulated by SEBI through SLBM.', module: '1' },
+  { id: 'g65', term: 'SLBM', definition: 'Securities Lending and Borrowing Mechanism — an automated screen-based platform for lending and borrowing securities. Tenure up to 12 months. Eligible securities are those in the F&O segment. Enables short selling in Indian markets on a regulated basis.', module: '1' },
+  { id: 'g66', term: 'CCP (India)', definition: 'Central Counterparty — in India: NCL (NSE Clearing Ltd), ICCL (Indian Clearing Corporation Ltd) and MCXCCL. Interposes between buyer and seller in every trade, guarantees settlement and eliminates counterparty risk by collecting margins and managing member defaults.', module: '1' },
+  { id: 'g67', term: 'Depository', definition: 'Holds securities in electronic dematerialised form and transfers them between buyers and sellers on settlement. India has two depositories: NSDL (National Securities Depository Ltd) and CDSL (Central Depository Services Ltd). Each investor holds a Demat account with a DP (Depository Participant).', module: '1' },
+  { id: 'g68', term: 'Trade Life Cycle', definition: 'Three-stage process: (1) Trade Execution — buyer and seller matched on exchange via brokers; (2) Clearing — clearing house determines net obligations of counterparties; (3) Settlement — funds transferred to seller and securities to buyer via depository. India: T+1 settlement for equities.', module: '1' },
+  { id: 'g70', term: 'Bonus Issue', definition: 'Free shares issued to existing shareholders in proportion to their holdings at no cost. Example: 2:1 bonus means 2 extra shares for every 1 held. Market price adjusts downward proportionally. Signals management confidence but does not change the economic value of holdings.', module: '1' },
+  { id: 'g71', term: 'Preferential Allotment', definition: 'Issue of securities to a select group (usually promoters) at a price determined as the higher of VWAP for preceding 26 weeks or 2 weeks. Lock-in: 18 months for promoters, 6 months for non-promoters. Cannot sell during lock-in period.', module: '1' },
+  { id: 'g72', term: 'Private Placement', definition: 'Issue of securities to a select group of not more than 200 allottees per financial year. Can be bonds, shares or convertible securities. Two types: Preferential Allotment and QIP. Does not require a public offer document.', module: '1' },
+  { id: 'g73', term: 'Book Building', definition: 'IPO pricing mechanism where investors bid at various price levels within a disclosed price band. Cut-off price determined by demand. QIBs pay 10% advance; others pay 100%. Only retail investors can bid at cut-off. Final prospectus filed with ROC after allotment.', module: '1' },
+  { id: 'g74', term: 'Fixed Price Issue', definition: 'IPO mechanism where the issuer decides the price in advance and states it in the offer document. Demand is only known after closure of the issue. 50% reserved for retail investors. 100% advance payment required from all categories.', module: '1' },
+  { id: 'g75', term: 'Red Herring Prospectus', definition: 'Offer document used in a book built issue — contains all information about the company but does not disclose the final issue price (only a price band). Filed with SEBI and made public before the issue opens. Final prospectus filed after price discovery.', module: '1' },
+  { id: 'g76', term: 'Prospectus', definition: 'Offer document used in a fixed price public issue containing all relevant information: company details, promoters, financials, objects of issue and terms. Called "Letter of Offer" in a rights issue. Filed with ROC after book-built issues.', module: '1' },
+  { id: 'g77', term: 'Entry Norm I — Profitability Route', definition: 'SEBI requirement for main board IPO: Net tangible assets ≥ ₹3 crore in each of preceding 3 years · Average pre-tax operating profit ≥ ₹15 crore in 3 of last 5 years · Net worth ≥ ₹1 crore · Minimum 3 years of operations · Issue size ≤ 5x pre-issue net worth.', module: '1' },
+  { id: 'g78', term: 'Entry Norm II — QIB Route', definition: 'SEBI route for loss-making or new companies: Issue through book building · At least 75% mandatory allotment to QIBs · Merchant banker holds 5% of QIB portion (skin in the game) · At least 15 QIB allottees · Positive net worth required. Used by Zomato, Swiggy, Paytm, PolicyBazaar.', module: '1' },
+  { id: 'g79', term: 'Entry Norm III — Appraisal Route', definition: 'SEBI route for infrastructure companies: Project appraised by banks or financial institutions · At least 15% of project funded by scheduled commercial banks or FIs. Used by infrastructure companies like IRB Infra, GMR Infra, Gammon Infra.', module: '1' },
+  { id: 'g80', term: 'Promoter Lock-in', definition: 'SEBI requirement that promoters contribute at least 20% of post-issue capital, locked in for 18 months post-listing. Remaining pre-issue capital locked in for 6 months. Ensures promoters have minimum stake after IPO and cannot dump shares immediately post-listing.', module: '1' },
+  { id: 'g81', term: 'Retail Individual Investor (RII)', definition: 'An investor who applies or bids for securities in an IPO for a value of not more than ₹2 lakh. Reserved category in IPOs: at least 35% in book-built issues, 50% in fixed price issues. Only category allowed to bid at cut-off price in book building.', module: '1' },
+  { id: 'g82', term: 'Qualified Institutional Buyer (QIB)', definition: 'Institutional investors such as mutual funds, insurance companies, FIIs, scheduled commercial banks and venture capital funds. Up to 50% reserved in book-built IPOs. Must pay only 10% advance in book building. At least 15 QIB allottees required under Entry Norm II.', module: '1' },
+  { id: 'g83', term: 'Non-Institutional Investor (NII)', definition: 'Investors who apply for more than ₹2 lakh in an IPO but are not QIBs — typically HNIs (High Net Worth Individuals) and corporate bodies. At least 15% reserved in book-built issues. Must pay 100% advance at time of application.', module: '1' },
+  { id: 'g84', term: "Innovator's Growth Platform (IGP)", definition: 'SEBI platform for technology startups to raise capital. Key features: 75% pre-issue holding by institutional investors · Lock-in of 6 months · Superior voting rights for promoters (founders) · Minimum application ₹2 lakh · Open offer trigger at 49% instead of 25%. Company can migrate to main board when 50% capital held by QIBs.', module: '1' },
+  { id: 'g85', term: 'Green Shoe Option', definition: 'Mechanism to stabilise post-listing share price of an IPO by issuing up to 15% additional shares if demand exceeds supply. Named after Green Shoe Manufacturing Company (first to use it, USA 1963). Called "Stabilisation Mechanism" under SEBI ICDR Regulations. Provides more stable listing price.', module: '1' },
+  { id: 'g86', term: 'Debenture Trustee', definition: 'Appointed to protect interests of debenture holders in a public issue of debt. Duties: call for periodic reports from issuer · enforce security · ensure property charged is adequate · monitor compliance with Companies Act and listing agreement · take action on breach of trust deed.', module: '1' },
+  { id: 'g87', term: 'Fundamental Analysis', definition: 'Approach to security analysis that estimates the intrinsic value of a security based on economic, industry and company factors — financial statements, earnings, growth, risk. Contrasts with technical analysis (which uses price/volume patterns) and EMH (which holds markets are always correctly priced).', module: '1' },
+  { id: 'g88', term: 'Technical Analysis', definition: 'Approach to security analysis that uses historical price and volume data to forecast future price movements. Based on the premise that market psychology and past patterns repeat. Contrasts with fundamental analysis which focuses on intrinsic value.', module: '1' },
+  { id: 'g89', term: 'Efficient Market Hypothesis (EMH)', definition: 'Theory that market prices reflect all available information at all times, making it impossible to consistently earn excess returns. Three forms: Weak (past prices), Semi-strong (all public information), Strong (all information including insider). Fundamental analysis is predicated on markets being not perfectly efficient.', module: '1' },
+  { id: 'g90', term: 'Top-down vs Bottom-up Investing', definition: 'Top-down: start with asset allocation (macro view → sector → stock). Bottom-up: start with individual stock selection regardless of macro. Top-down investors ask "which sectors will benefit?" first. Bottom-up investors look for undervalued stocks regardless of sector or economic cycle.', module: '1' },
+  { id: 'g91', term: 'Security Selection', definition: 'Second step in the investment process — choosing which specific securities to hold within each asset class. Involves security analysis to determine intrinsic value and compare to market price. In top-down investing, follows asset allocation; in bottom-up, it is the starting point.', module: '1' },
+  { id: 'g92', term: 'Indirect Finance', definition: 'Flow of funds from lender-savers to borrower-spenders through financial intermediaries (banks, NBFCs, mutual funds). The intermediary takes on the credit risk. Contrasts with direct finance where investors buy securities issued directly by borrowers through financial markets.', module: '1' },
+  { id: 'g93', term: 'Voting Machine vs Weighing Machine', definition: 'Ben Graham\'s metaphor for stock markets: in the short run the market is a voting machine (reflecting sentiment and popularity) but in the long run it is a weighing machine (reflecting true economic value). Foundation for value investing — price and value diverge short-term but converge long-term.', module: '1' },
+  { id: 'g94', term: 'Manic-Depressive Market', definition: 'Ben Graham\'s description of market behaviour — markets swing between extreme optimism (mania) and extreme pessimism (depression) driven by investor psychology rather than fundamentals. The intelligent investor exploits these mood swings rather than being swept up in them.', module: '1' }
+
 ];
 
 
@@ -1224,20 +1283,26 @@ function loadData(key, fallback) {
   try { const d = localStorage.getItem('sa402_' + key); return d ? JSON.parse(d) : fallback; } catch(e) { return fallback; }
 }
 
+let hiddenGlossaryIds = new Set();
+
 async function syncFromSheets() {
   showToast('Loading data...');
-  const [sheetResources, sheetAnn, sheetGloss] = await Promise.all([
+  const [sheetResources, sheetAnn, sheetGloss, sheetHidden] = await Promise.all([
     apiRead('Resources'),
     apiRead('Announcements'),
-    apiRead('Glossary')
+    apiRead('Glossary'),
+    apiRead('HiddenGlossary')
   ]);
+
+  // Load hidden glossary IDs
+  if (sheetHidden && Array.isArray(sheetHidden)) {
+    hiddenGlossaryIds = new Set(sheetHidden.map(r => r.id).filter(Boolean));
+  }
 
   if (sheetResources && Array.isArray(sheetResources)) {
     const savedIds = new Set(sheetResources.map(r => r.id));
     const defaults = DEFAULT_RESOURCES.filter(r => !savedIds.has(r.id));
-    // Sheet version always wins — put sheet first so its published state is used
     resources = [...sheetResources, ...defaults];
-    // Save defaults to sheet so their published state persists on next toggle
     if (defaults.length > 0) {
       await apiWrite('Resources', resources);
     }
@@ -1250,8 +1315,13 @@ async function syncFromSheets() {
   }
 
   if (sheetGloss && Array.isArray(sheetGloss) && sheetGloss.length > 0) {
-    glossary = sheetGloss;
-    saveData('glossary', glossary);
+    const defaultIds = new Set(DEFAULT_GLOSSARY.map(g => g.id));
+    const extraTerms = sheetGloss.filter(g => !defaultIds.has(g.id));
+    // Apply hidden filter to defaults
+    const visibleDefaults = DEFAULT_GLOSSARY.filter(g => !hiddenGlossaryIds.has(g.id));
+    glossary = [...visibleDefaults, ...extraTerms];
+  } else {
+    glossary = DEFAULT_GLOSSARY.filter(g => !hiddenGlossaryIds.has(g.id));
   }
 
   renderResources();
@@ -1263,8 +1333,14 @@ async function syncFromSheets() {
 }
 
 async function saveToSheets(sheet, data) {
-  // Save ALL resources including defaults so published state persists
-  await apiWrite(sheet, data);
+  if (sheet === 'Glossary') {
+    // Only save terms added via portal — defaults are hardcoded in file
+    const defaultIds = new Set(DEFAULT_GLOSSARY.map(g => g.id));
+    const extraTerms = data.filter(g => !defaultIds.has(g.id));
+    await apiWrite(sheet, extraTerms);
+  } else {
+    await apiWrite(sheet, data);
+  }
 }
 
 const DEFAULT_RESOURCES = [
@@ -1289,9 +1365,9 @@ function loadResources() {
 
 let resources = loadResources();
 localStorage.removeItem('sa402_resources'); // Always load resources fresh from Google Sheet
+localStorage.removeItem('sa402_glossary');  // Always reload glossary from defaults + sheet
 let announcements = loadData('announcements', []);
-let glossary = loadData('glossary', null);
-if (!glossary) { glossary = DEFAULT_GLOSSARY; saveData('glossary', glossary); }
+let glossary = DEFAULT_GLOSSARY;
 
 // =====================
 // ROLE MANAGEMENT
@@ -1386,13 +1462,14 @@ function selectModule(idx) {
 function renderModuleContent() {
   const m = MODULES_DATA[activeModule];
   let html = `<div class="card" style="margin-bottom:0">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.25rem;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem;">
       <div style="width:40px;height:40px;border-radius:8px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;flex-shrink:0;">${m.id}</div>
       <div>
         <div style="font-size:1.05rem;font-weight:700;color:var(--primary)">${m.title}</div>
         <div style="font-size:0.75rem;color:var(--text-muted)">${m.sessions.length} Session${m.sessions.length>1?'s':''}</div>
       </div>
-    </div>`;
+    </div>
+    ${m.learningOutcome ? `<div style="background:var(--surface2);border-left:3px solid var(--primary);border-radius:0 6px 6px 0;padding:10px 14px;margin-bottom:1.25rem;"><div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--primary);margin-bottom:4px">Learning Outcome</div><div style="font-size:0.88rem;color:var(--text-secondary);line-height:1.6">${m.learningOutcome}</div></div>` : ''}`;
 
   m.sessions.forEach(s => {
     html += `<div class="session-card">
@@ -1670,12 +1747,13 @@ function renderGlossary() {
   `).join('');
 }
 
-function saveGlossaryTerm() {
+async function saveGlossaryTerm() {
   const term = document.getElementById('gloss-term').value.trim();
   const def = document.getElementById('gloss-def').value.trim();
   const module = document.getElementById('gloss-module').value;
   if (!term || !def) { alert('Please fill in the term and definition.'); return; }
-  glossary.push({ id: 'g' + Date.now(), term, definition: def, module });
+  const newTerm = { id: 'g' + Date.now(), term, definition: def, module };
+  glossary.push(newTerm);
   saveData('glossary', glossary);
   saveToSheets('Glossary', glossary);
   closeModal('modalGloss');
@@ -1685,9 +1763,15 @@ function saveGlossaryTerm() {
   showToast('Term added — saved to Google Sheet');
 }
 
-function deleteGlossary(id) {
+async function deleteGlossary(id) {
   if (!isInstructor) return;
+  const defaultIds = new Set(DEFAULT_GLOSSARY.map(g => g.id));
   glossary = glossary.filter(g => g.id !== id);
+  // If it's a hardcoded default term, save its ID to HiddenGlossary sheet
+  if (defaultIds.has(id)) {
+    hiddenGlossaryIds.add(id);
+    await apiWrite('HiddenGlossary', [...hiddenGlossaryIds].map(hid => ({ id: hid })));
+  }
   saveData('glossary', glossary);
   saveToSheets('Glossary', glossary);
   buildAlphaFilter();
