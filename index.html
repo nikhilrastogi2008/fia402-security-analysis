@@ -622,7 +622,7 @@
     <div id="instructor-add-resource" style="display:none;">
       <div class="instructor-section">
         <div class="instructor-label"><i class="ti ti-lock-open"></i> Instructor Controls</div>
-        <button class="btn btn-primary" onclick="openModal('modalResource')">
+        <button class="btn btn-primary" onclick="editingResourceId=null;document.querySelector('#modalResource .modal-title').innerHTML='<i class=\'ti ti-folder-plus\'></i> Add Resource';document.querySelector('#modalResource .btn-primary').innerHTML='<i class=\'ti ti-check\'></i> Add Resource';['res-title','res-desc','res-session','res-url'].forEach(id=>document.getElementById(id).value='');openModal('modalResource')">
           <i class="ti ti-plus"></i> Add Resource
         </button>
       </div>
@@ -1258,21 +1258,59 @@ let glossAlphaFilter = 'all';
 
 const API_URL = 'https://script.google.com/macros/s/AKfycbzBnw6BtSYux5OK9PG0WdT-6Ip5TaaU9aRV8dlDBIlyWG04oyC7zXAe_qldAxW-vpjtjA/exec';
 
-async function apiRead(sheet) {
-  try {
-    const resp = await fetch(`${API_URL}?action=read&sheet=${sheet}`);
-    return await resp.json();
-  } catch(e) { return null; }
+// JSONP-style read — bypasses CORS issues with Google Apps Script redirects
+function apiRead(sheet) {
+  return new Promise((resolve) => {
+    const callbackName = 'jsonpCallback_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
+    const script = document.createElement('script');
+    let settled = false;
+
+    window[callbackName] = function(data) {
+      if (settled) return;
+      settled = true;
+      resolve(data);
+      delete window[callbackName];
+      script.remove();
+    };
+
+    script.onerror = function() {
+      if (settled) return;
+      settled = true;
+      console.error('apiRead JSONP failed for', sheet);
+      resolve(null);
+      delete window[callbackName];
+      script.remove();
+    };
+
+    // Timeout safety net
+    setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      console.error('apiRead timed out for', sheet);
+      resolve(null);
+      delete window[callbackName];
+      script.remove();
+    }, 10000);
+
+    script.src = `${API_URL}?action=read&sheet=${sheet}&callback=${callbackName}`;
+    document.body.appendChild(script);
+  });
 }
 
 async function apiWrite(sheet, rows) {
   try {
-    await fetch(API_URL, {
+    const resp = await fetch(API_URL, {
       method: 'POST',
+      redirect: 'follow',
       headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({ action: 'write', sheet, rows })
     });
-  } catch(e) {}
+    if (!resp.ok) {
+      console.error('apiWrite failed for', sheet, '— status:', resp.status);
+    }
+  } catch(e) {
+    console.error('apiWrite error for', sheet, ':', e);
+  }
 }
 
 function saveData(key, val) {
@@ -1572,6 +1610,9 @@ function renderResources() {
       <div class="resource-actions">
         ${r.url ? `<a href="${r.url}" target="_blank" class="btn btn-success btn-sm"><i class="ti ti-external-link"></i> Open</a>` : ''}
         ${isInstructor ? `
+          <button class="btn btn-sm btn-outline" onclick="editResource('${r.id}')" title="Edit this resource">
+            <i class="ti ti-pencil"></i> Edit
+          </button>
           <button class="btn btn-sm ${isPublished ? 'btn-warning' : 'btn-primary'}" onclick="togglePublish('${r.id}')" title="${isPublished ? 'Hide from students' : 'Publish to students'}">
             <i class="ti ${isPublished ? 'ti-eye-off' : 'ti-eye'}"></i> ${isPublished ? 'Unpublish' : 'Publish'}
           </button>
@@ -1594,6 +1635,24 @@ function togglePublish(id) {
   showToast(r.published ? '✓ Resource published — students can now see it' : 'Resource unpublished — hidden from students');
 }
 
+let editingResourceId = null;
+
+function editResource(id) {
+  if (!isInstructor) return;
+  const r = resources.find(r => r.id === id);
+  if (!r) return;
+  editingResourceId = id;
+  document.getElementById('res-title').value = r.title || '';
+  document.getElementById('res-desc').value = r.description || '';
+  document.getElementById('res-module').value = r.module || '1';
+  document.getElementById('res-session').value = r.session || '';
+  document.getElementById('res-type').value = r.type || 'pdf';
+  document.getElementById('res-url').value = r.url || '';
+  document.querySelector('#modalResource .modal-title').innerHTML = '<i class="ti ti-pencil"></i> Edit Resource';
+  document.querySelector('#modalResource .btn-primary').innerHTML = '<i class="ti ti-check"></i> Save Changes';
+  openModal('modalResource');
+}
+
 function saveResource() {
   const title = document.getElementById('res-title').value.trim();
   const desc = document.getElementById('res-desc').value.trim();
@@ -1602,14 +1661,29 @@ function saveResource() {
   const type = document.getElementById('res-type').value;
   const url = document.getElementById('res-url').value.trim();
   if (!title) { alert('Please enter a title.'); return; }
-  // New resources start as Draft by default
-  resources.push({ id: 'r' + Date.now(), title, description: desc, module, session, type, url, published: 'FALSE' });
+
+  if (editingResourceId) {
+    // Editing an existing resource — keep its id and published state
+    const r = resources.find(r => r.id === editingResourceId);
+    if (r) {
+      r.title = title; r.description = desc; r.module = module;
+      r.session = session; r.type = type; r.url = url;
+    }
+    editingResourceId = null;
+    showToast('Resource updated — saved to Google Sheet');
+  } else {
+    // New resources start as Draft by default
+    resources.push({ id: 'r' + Date.now(), title, description: desc, module, session, type, url, published: 'FALSE' });
+    showToast('Resource added as Draft — click Publish when ready to share with students');
+  }
+
   saveData('resources', resources);
   saveToSheets('Resources', resources);
   closeModal('modalResource');
+  document.querySelector('#modalResource .modal-title').innerHTML = '<i class="ti ti-folder-plus"></i> Add Resource';
+  document.querySelector('#modalResource .btn-primary').innerHTML = '<i class="ti ti-check"></i> Add Resource';
   ['res-title','res-desc','res-session','res-url'].forEach(id => document.getElementById(id).value = '');
   renderResources();
-  showToast('Resource added as Draft — click Publish when ready to share with students');
 }
 
 function deleteResource(id) {
