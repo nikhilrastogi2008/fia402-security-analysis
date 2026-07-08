@@ -1633,12 +1633,7 @@ function renderResources() {
   let filtered = resources.filter(r => resourceFilter === 'all' || String(r.module) === String(resourceFilter));
   if (!isInstructor) filtered = filtered.filter(r => isPublishedVal(r.published));
 
-  if (filtered.length === 0) {
-    list.innerHTML = `<div class="empty-state"><i class="ti ti-folder-x"></i><p>No resources yet${resourceFilter !== 'all' ? ' for this module' : ''}. ${isInstructor ? 'Add one above.' : 'Check back later.'}</p></div>`;
-    return;
-  }
-
-  // Group by folder
+  // Group resources by folder
   const folderMap = {};
   filtered.forEach(r => {
     const folder = r.folder || 'General';
@@ -1646,7 +1641,21 @@ function renderResources() {
     folderMap[folder].push(r);
   });
 
-  // Sort folders: General first, then alphabetical
+  // Show empty folders that exist for current module
+  if (resourceFilter !== 'all') {
+    getFoldersForModule(resourceFilter).forEach(f => { if (!folderMap[f]) folderMap[f] = []; });
+  }
+
+  // Always ensure General exists
+  if (!folderMap['General']) folderMap['General'] = [];
+
+  // If truly nothing — no resources and no named folders
+  const hasContent = filtered.length > 0 || Object.keys(folderMap).some(k => k !== 'General');
+  if (!hasContent && !(getFoldersForModule(resourceFilter !== 'all' ? resourceFilter : '1').length)) {
+    list.innerHTML = `<div class="empty-state"><i class="ti ti-folder-x"></i><p>No resources yet${resourceFilter !== 'all' ? ' for this module' : ''}. ${isInstructor ? 'Add one above.' : 'Check back later.'}</p></div>`;
+    return;
+  }
+
   const folderOrder = Object.keys(folderMap).sort((a, b) => {
     if (a === 'General') return -1;
     if (b === 'General') return 1;
@@ -1665,90 +1674,40 @@ function renderResources() {
             <span class="folder-count">${items.length} item${items.length !== 1 ? 's' : ''}</span>
           </div>
           <div style="display:flex;align-items:center;gap:8px">
-            ${isInstructor ? `<button class="btn btn-sm btn-outline" onclick="event.stopPropagation();renameFolder('${folder}')" title="Rename folder" style="padding:3px 8px;font-size:0.75rem"><i class="ti ti-pencil"></i></button>
-            <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deleteFolder('${folder}')" title="Delete folder (moves resources to General)" style="padding:3px 8px;font-size:0.75rem"><i class="ti ti-trash"></i></button>` : ''}
+            ${isInstructor ? `
+              <button class="btn btn-sm btn-outline" onclick="event.stopPropagation();renameFolder('${folder}')" title="Rename" style="padding:3px 8px;font-size:0.75rem"><i class="ti ti-pencil"></i></button>
+              <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deleteFolder('${folder}')" title="Delete" style="padding:3px 8px;font-size:0.75rem"><i class="ti ti-trash"></i></button>
+            ` : ''}
             <i class="ti ti-chevron-down folder-toggle" id="toggle_${folderId}"></i>
           </div>
         </div>
         <div class="folder-items" id="${folderId}">
-          ${items.map(r => renderResourceItem(r)).join('')}
+          ${items.length > 0
+            ? items.map(r => renderResourceItem(r)).join('')
+            : `<div style="padding:10px 14px;font-size:0.85rem;color:var(--text-muted);font-style:italic">No resources in this folder yet.</div>`}
         </div>
       </div>`;
   }).join('');
 }
 
-function renderResourceItem(r) {
-  const isPublished = isPublishedVal(r.published);
-  return `
-  <div class="resource-item" style="${!isPublished && isInstructor ? 'opacity:0.6;border-left:3px solid var(--warn,#f59e0b)' : ''}">
-    <div class="resource-icon ${r.type}">
-      <i class="ti ${typeIcons[r.type] || 'ti-file'}"></i>
-    </div>
-    <div class="resource-meta">
-      <div class="resource-title">${r.title} ${!isPublished && isInstructor ? '<span style="font-size:0.7rem;padding:2px 7px;border-radius:20px;background:#fef3c7;color:#92400e;font-weight:600;margin-left:6px">DRAFT</span>' : ''}</div>
-      <div class="resource-desc">${r.description || ''}</div>
-      <div class="resource-tags">
-        <span class="tag tag-module">${moduleNames[r.module] || 'M' + r.module}</span>
-        <span class="tag tag-type">${typeLabels[r.type] || r.type}</span>
-        ${r.session ? `<span class="tag tag-session">Session ${r.session}</span>` : ''}
-      </div>
-    </div>
-    <div class="resource-actions">
-      ${r.url ? `<a href="${r.url}" target="_blank" class="btn btn-success btn-sm"><i class="ti ti-external-link"></i> Open</a>` : ''}
-      ${isInstructor ? `
-        <button class="btn btn-sm btn-outline" onclick="editResource('${r.id}')" title="Edit"><i class="ti ti-pencil"></i></button>
-        <button class="btn btn-sm ${isPublished ? 'btn-warning' : 'btn-primary'}" onclick="togglePublish('${r.id}')" title="${isPublished ? 'Unpublish' : 'Publish'}">
-          <i class="ti ${isPublished ? 'ti-eye-off' : 'ti-eye'}"></i>
-        </button>
-        <button class="btn btn-danger btn-sm" onclick="deleteResource('${r.id}')"><i class="ti ti-trash"></i></button>
-      ` : ''}
-    </div>
-  </div>`;
-}
-
-function toggleFolder(folderId) {
-  const items = document.getElementById(folderId);
-  const toggle = document.getElementById('toggle_' + folderId);
-  if (!items) return;
-  const collapsed = items.classList.toggle('collapsed');
-  if (toggle) toggle.classList.toggle('collapsed', collapsed);
-}
-
-// --- FOLDER MANAGEMENT ---
-
-let folders = {}; // { '1': ['Lecture Slides', 'Quizzes'], '2': [...] }
-
-function getFoldersForModule(module) {
-  return folders[String(module)] || [];
-}
-
-function populateFolderSelect(module) {
-  const mod = module || document.getElementById('res-module').value || '1';
-  const sel = document.getElementById('res-folder');
-  if (!sel) return;
-  const modFolders = getFoldersForModule(mod);
-  sel.innerHTML = `<option value="">None (General)</option>` +
-    modFolders.map(f => `<option value="${f}">${f}</option>`).join('');
-}
-
 function promptNewFolder() {
-  const mod = document.getElementById('res-module')?.value || resourceFilter !== 'all' ? resourceFilter : '1';
-  const name = prompt('Enter folder name:');
+  const formMod = document.getElementById('res-module') ? document.getElementById('res-module').value : null;
+  const activeMod = resourceFilter !== 'all' ? resourceFilter : null;
+  const mod = String(formMod || activeMod || '1');
+  const name = prompt('Enter new folder name for Module ' + mod + ':');
   if (!name || !name.trim()) return;
-  const modKey = String(mod === 'all' ? '1' : mod);
-  if (!folders[modKey]) folders[modKey] = [];
-  if (!folders[modKey].includes(name.trim())) {
-    folders[modKey].push(name.trim());
-    saveFolders();
-    populateFolderSelect(modKey);
-    // Auto-select the new folder in the dropdown
-    const sel = document.getElementById('res-folder');
-    if (sel) sel.value = name.trim();
-    showToast('Folder "' + name.trim() + '" created');
-  } else {
-    showToast('Folder already exists');
-  }
+  const trimmed = name.trim();
+  if (!folders[mod]) folders[mod] = [];
+  if (folders[mod].includes(trimmed)) { showToast('Folder already exists'); return; }
+  folders[mod].push(trimmed);
+  saveFolders();
+  populateFolderSelect(mod);
+  const sel = document.getElementById('res-folder');
+  if (sel) sel.value = trimmed;
+  renderResources();
+  showToast('Folder "' + trimmed + '" created in Module ' + mod);
 }
+
 
 function renameFolder(oldName) {
   const newName = prompt('Rename folder to:', oldName);
