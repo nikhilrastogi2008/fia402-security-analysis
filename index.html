@@ -1754,30 +1754,32 @@ function renameFolder(oldName) {
   const newName = prompt('Rename folder to:', oldName);
   if (!newName || !newName.trim() || newName.trim() === oldName) return;
   const trimmed = newName.trim();
-  // Update folder list in all modules
-  Object.keys(folders).forEach(mod => {
+  const mod = String(resourceFilter === 'all' ? '1' : resourceFilter);
+  // Update folder list for this module only
+  if (folders[mod]) {
     const idx = folders[mod].indexOf(oldName);
     if (idx > -1) folders[mod][idx] = trimmed;
-  });
-  // Update all resources in that folder
-  // 'General' is the display name for resources with folder='' or folder=undefined
+  }
+  // Update resources in this module only
   resources.forEach(r => {
-    if (r.folder === oldName) { r.folder = trimmed; }
-    if (oldName === 'General' && (!r.folder || r.folder === '')) { r.folder = trimmed; }
+    if (String(r.module) !== mod) return;
+    if (r.folder === oldName) r.folder = trimmed;
+    if (oldName === 'General' && (!r.folder || r.folder === '')) r.folder = trimmed;
   });
   saveFolders();
   saveData('resources', resources);
   saveToSheets('Resources', resources);
   renderResources();
-  showToast('Folder renamed to "' + trimmed + '"');
+  showToast('Folder renamed to "' + trimmed + '" in Module ' + mod);
 }
 
 function deleteFolder(name) {
   if (!confirm('Delete folder "' + name + '"? Resources will be moved to General.')) return;
-  Object.keys(folders).forEach(mod => {
-    folders[mod] = (folders[mod] || []).filter(f => f !== name);
-  });
+  const mod = String(resourceFilter === 'all' ? '1' : resourceFilter);
+  if (folders[mod]) folders[mod] = folders[mod].filter(f => f !== name);
+  // Move resources in this module only back to General
   resources.forEach(r => {
+    if (String(r.module) !== mod) return;
     if (r.folder === name) r.folder = '';
     if (name === 'General' && (!r.folder || r.folder === '')) r.folder = '';
   });
