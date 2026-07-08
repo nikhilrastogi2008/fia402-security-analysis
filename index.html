@@ -1798,9 +1798,8 @@ function renderResources() {
 }
 
 function promptNewFolder() {
-  const formMod = document.getElementById('res-module') ? document.getElementById('res-module').value : null;
-  const activeMod = resourceFilter !== 'all' ? resourceFilter : null;
-  const mod = String(formMod || activeMod || '1');
+  // Always use the currently active module filter
+  const mod = String(resourceFilter !== 'all' ? resourceFilter : '1');
   const name = prompt('Enter new folder name for Module ' + mod + ':');
   if (!name || !name.trim()) return;
   const trimmed = name.trim();
