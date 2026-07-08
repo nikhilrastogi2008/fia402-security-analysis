@@ -1747,8 +1747,7 @@ function renderResources() {
     getFoldersForModule(resourceFilter).forEach(f => { if (!folderMap[f]) folderMap[f] = []; });
   }
 
-  // Always ensure General exists
-  if (!folderMap['General']) folderMap['General'] = [];
+  // Always ensure unfoldered resources still appear (under no folder header)
 
   // If truly nothing — no resources and no named folders
   const hasContent = filtered.length > 0 || Object.keys(folderMap).some(k => k !== 'General');
@@ -1766,6 +1765,13 @@ function renderResources() {
   list.innerHTML = folderOrder.map(folder => {
     const items = folderMap[folder];
     const folderId = 'folder_' + folder.replace(/[^a-z0-9]/gi, '_');
+
+    // Resources with no folder assigned — render flat, no folder wrapper
+    if (folder === 'General') {
+      return items.map(r => renderResourceItem(r)).join('');
+    }
+
+    // Named folders — render with collapsible folder header
     return `
       <div class="folder-section">
         <div class="folder-header" onclick="toggleFolder('${folderId}')">
