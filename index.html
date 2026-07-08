@@ -254,6 +254,20 @@
   }
   .filter-btn:hover, .filter-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 
+  .folder-section { margin-bottom: 1.25rem; }
+  .folder-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 12px; background: var(--surface2);
+    border-radius: var(--radius); margin-bottom: 8px;
+    border-left: 3px solid var(--primary); cursor: pointer;
+  }
+  .folder-header:hover { background: var(--border); }
+  .folder-name { font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .folder-count { font-size: 0.75rem; color: var(--text-muted); }
+  .folder-toggle { font-size: 0.8rem; color: var(--text-muted); transition: transform .2s; }
+  .folder-toggle.collapsed { transform: rotate(-90deg); }
+  .folder-items { padding-left: 4px; }
+  .folder-items.collapsed { display: none; }
   .resource-item {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -622,8 +636,11 @@
     <div id="instructor-add-resource" style="display:none;">
       <div class="instructor-section">
         <div class="instructor-label"><i class="ti ti-lock-open"></i> Instructor Controls</div>
-        <button class="btn btn-primary" onclick="editingResourceId=null;document.querySelector('#modalResource .modal-title').innerHTML='<i class=\'ti ti-folder-plus\'></i> Add Resource';document.querySelector('#modalResource .btn-primary').innerHTML='<i class=\'ti ti-check\'></i> Add Resource';['res-title','res-desc','res-session','res-url'].forEach(id=>document.getElementById(id).value='');openModal('modalResource')">
+        <button class="btn btn-primary" onclick="editingResourceId=null;document.querySelector('#modalResource .modal-title').innerHTML='<i class=\'ti ti-folder-plus\'></i> Add Resource';document.querySelector('#modalResource .btn-primary').innerHTML='<i class=\'ti ti-check\'></i> Add Resource';['res-title','res-desc','res-session','res-url'].forEach(id=>document.getElementById(id).value='');populateFolderSelect();openModal('modalResource')">
           <i class="ti ti-plus"></i> Add Resource
+        </button>
+        <button class="btn btn-outline" onclick="promptNewFolder()" style="margin-left:6px">
+          <i class="ti ti-folder-plus"></i> New Folder
         </button>
       </div>
     </div>
@@ -718,7 +735,7 @@
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
       <div class="form-group">
         <label class="form-label">Module</label>
-        <select class="form-control" id="res-module">
+        <select class="form-control" id="res-module" onchange="populateFolderSelect(this.value)">
           <option value="1">Module 1 — Intro</option>
           <option value="2">Module 2 — Fixed Income</option>
           <option value="3">Module 3 — EIC</option>
@@ -742,6 +759,13 @@
         <option value="case">Case Study</option>
         <option value="simulation">Simulation</option>
       </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Folder <span style="font-size:0.75rem;color:var(--text-muted)">(optional — assign to a folder within the module)</span></label>
+      <div style="display:flex;gap:8px">
+        <select class="form-control" id="res-folder" style="flex:1"></select>
+        <button class="btn btn-outline" onclick="promptNewFolder()" title="Create new folder" style="flex-shrink:0;padding:8px 12px"><i class="ti ti-folder-plus"></i> New</button>
+      </div>
     </div>
     <div class="form-group">
       <label class="form-label">Shareable URL</label>
@@ -1242,32 +1266,7 @@ const DEFAULT_GLOSSARY = [
   { id: 'g91', term: 'Security Selection', definition: 'Second step in the investment process — choosing which specific securities to hold within each asset class. Involves security analysis to determine intrinsic value and compare to market price. In top-down investing, follows asset allocation; in bottom-up, it is the starting point.', module: '1' },
   { id: 'g92', term: 'Indirect Finance', definition: 'Flow of funds from lender-savers to borrower-spenders through financial intermediaries (banks, NBFCs, mutual funds). The intermediary takes on the credit risk. Contrasts with direct finance where investors buy securities issued directly by borrowers through financial markets.', module: '1' },
   { id: 'g93', term: 'Voting Machine vs Weighing Machine', definition: 'Ben Graham\'s metaphor for stock markets: in the short run the market is a voting machine (reflecting sentiment and popularity) but in the long run it is a weighing machine (reflecting true economic value). Foundation for value investing — price and value diverge short-term but converge long-term.', module: '1' },
-  { id: 'g94', term: 'Manic-Depressive Market', definition: 'Ben Graham\'s description of market behaviour — markets swing between extreme optimism (mania) and extreme pessimism (depression) driven by investor psychology rather than fundamentals. The intelligent investor exploits these mood swings rather than being swept up in them.', module: '1' },
-  { id: 'g95', term: 'Indenture', definition: 'The legal contract between a bond issuer and bondholders. Contains all terms of the bond: coupon rate, maturity date, par value, covenants (restrictions on issuer), collateral pledged, and subordination clauses. Protects bondholder interests by imposing conditions on the borrower.', module: '2' },
-  { id: 'g96', term: 'Bond Covenants', definition: 'Restrictions in the bond indenture that protect bondholders. Key types: (1) Subordination of future debt — restricts additional borrowing; (2) Dividend restrictions — forces firm to retain assets; (3) Collateral — a specific asset bondholders receive if the firm defaults. Violation of covenants constitutes technical default.', module: '2' },
-  { id: 'g97', term: 'Par Value / Face Value', definition: 'The principal amount repaid to bondholders at maturity. Typically ₹100 in India and $1,000 in the US. The coupon rate is applied to face value to determine the periodic interest payment. A bond trading above par is at a premium; below par is at a discount.', module: '2' },
-  { id: 'g98', term: 'Coupon Payment', definition: 'Periodic interest payment made by the bond issuer to the bondholder. Coupon = Coupon rate × Face value. Example: 10% coupon on ₹100 face value = ₹10 per year. Usually paid semi-annually in India for G-Secs; annually or semi-annually for corporate bonds.', module: '2' },
-  { id: 'g99', term: 'Bond Price — PV formula', definition: 'Bond price = Σ [Coupon / (1+YTM)^t] + [Face value / (1+YTM)^n]. Example: 5-year, 10% annual coupon bond at YTM 11% → price = 9.01 + 8.12 + 7.31 + 6.59 + 65.28 = ₹96.30. Price and YTM move inversely — when YTM rises, price falls and vice versa.', module: '2' },
-  { id: 'g100', term: 'Price–Yield Relationship', definition: 'Inverse relationship between bond price and yield. When YTM > coupon rate → bond trades at discount (price < face value). When YTM < coupon rate → bond trades at premium (price > face value). When YTM = coupon rate → bond trades at par. Example from PPTX: 10% bond at YTM 11% → price ₹96.30 (discount); at YTM 8.72% → price ₹105 (premium).', module: '2' },
-  { id: 'g101', term: 'Realized Return', definition: 'Actual return earned when a bond is held to maturity — depends on the rate at which intermediate coupons are reinvested. Differs from YTM unless coupons are reinvested exactly at YTM. Example from PPTX: Investor A (coupons not reinvested) earns less than YTM; Investor C (coupons reinvested at 10%) earns exactly YTM of 10%.', module: '2' },
-  { id: 'g102', term: 'Reinvestment Risk', definition: 'Risk that intermediate coupon payments will be reinvested at a lower rate than the YTM assumed. When yields fall, coupons are reinvested at lower rates, reducing realized return below YTM. Reinvestment risk and price risk have opposite effects — a yield decrease hurts reinvestment income but boosts the sale price of the bond.', module: '2' },
-  { id: 'g103', term: 'Price Risk', definition: 'Risk of capital loss if a bond is sold before maturity and yields have risen. A rise in yields after purchase reduces the bond\'s market price. Opposite of reinvestment risk — a yield increase hurts the sale price but benefits reinvestment of coupons. Long-duration bonds have higher price risk.', module: '2' },
-  { id: 'g104', term: 'Holding Period Return (HPR)', definition: 'Return earned on a bond over an investment horizon shorter than maturity. HPR depends on: (1) coupon income received, (2) reinvestment rate on coupons, and (3) price at which the bond is sold. Example from PPTX: 10% bond held for 3 years: HPR = 10.80% if yields fall to 8%; HPR = 9.62% if yields rise to 11%.', module: '2' },
-  { id: 'g105', term: 'Bond Equivalent Yield (BEY)', definition: 'Annualised yield for a bond with semi-annual coupon payments, quoted on a semi-annual basis × 2. For a 10% semi-annual coupon bond, BEY = 2 × semi-annual YTM. BEY overstates the effective annual yield because it ignores intra-year compounding. Effective annual yield = (1 + semi-annual YTM)² − 1.', module: '2' },
-  { id: 'g106', term: 'Current Yield', definition: 'Annual coupon payment divided by the current market price. Example: 8% coupon bond trading at ₹900 (face value ₹1,000) → current yield = ₹80 / ₹900 = 8.89%. Does not account for capital gain/loss at maturity or reinvestment income. Always between coupon rate and YTM for discount/premium bonds.', module: '2' },
-  { id: 'g107', term: 'Accrued Interest', definition: 'Interest earned by the bond seller from the last coupon date to the settlement date. Formula: AI = Coupon × (Days since last coupon / Days in coupon period). Example from PPTX: 10% semi-annual bond, 57 days since last coupon out of 181 days → AI = 5 × (57/181) = ₹1.57. Buyer pays accrued interest to seller at settlement.', module: '2' },
-  { id: 'g108', term: 'Clean Price vs Dirty Price', definition: 'Clean price (flat price): price quoted in the market, excluding accrued interest. Dirty price (full price / invoice price): clean price + accrued interest — the actual amount the buyer pays. Example from PPTX: Clean price = ₹101, accrued interest = ₹1.57 → Dirty price = ₹102.57. Bond price tables and Bloomberg quote clean prices.', module: '2' },
-  { id: 'g109', term: 'Zero Coupon Bond (ZCB)', definition: 'Issued at a discount to face value and redeemed at face value. No periodic coupon payments — return comes entirely from price appreciation. Price of ZCB = Face value / (1+YTM)^n. Example from PPTX: Sardar Sarovar Ltd ZCB — issued at ₹3,500, redeemed at ₹1,10,000 in 14 years → YTM can be calculated from these values. Zero reinvestment risk since no coupons to reinvest.', module: '2' },
-  { id: 'g110', term: 'Convertible Bond', definition: 'Bond with embedded option allowing the holder to convert into equity shares at a predetermined conversion price on or before maturity. Holder converts only if share price exceeds conversion price. Example from PPTX: 10%, 5-year bond convertible into 5 shares at ₹20/share — convert if share trades above ₹20. Companies issue convertible bonds to reduce coupon rate by offering the equity upside.', module: '2' },
-  { id: 'g111', term: 'Callable Bond', definition: 'Bond that gives the issuer the right to redeem before maturity at a specified call price. Issuers call bonds when interest rates fall — they retire high-coupon debt and reissue at lower rates. Example from PPTX: 8% coupon, 4-year bond callable in 2 years at ₹1,100 → YTC = 12.7%, YTM = 8%. For callable bonds, price is capped near the call price when rates fall.', module: '2' },
-  { id: 'g112', term: 'Yield to Call (YTC)', definition: 'IRR calculated assuming the bond is called at the first call date and call price rather than held to maturity. More relevant for callable bonds trading at or above the call price in a low/falling rate environment. Example from PPTX: 8% bond callable at ₹1,100 in 2 years → YTC = 12.7% (higher than YTM of 8% because call price > par).', module: '2' },
-  { id: 'g113', term: 'Puttable Bond', definition: 'Bond that gives the holder the right to sell the bond back to the issuer at a specified put price before maturity. Provides downside protection to investors — if rates rise (and prices fall), investors can put the bond back at par rather than suffering a capital loss. Benefits investor; costs issuer. Lower yield than equivalent non-puttable bond.', module: '2' },
-  { id: 'g114', term: 'Catastrophe Bond', definition: 'Bond with embedded option allowing the issuer (typically a government or insurer) to reduce or suspend interest/principal payments if a specified catastrophic event occurs (earthquake, pandemic, hurricane). Investors receive higher yields for bearing this tail risk. Example: World Bank issued pandemic bonds in 2017 — triggered during COVID-19.', module: '2' },
-  { id: 'g115', term: 'Credit Rating', definition: 'Assessment of the creditworthiness of a bond issuer by rating agencies (Moody\'s, S&P, Fitch globally; CRISIL, ICRA, CARE in India). Rating categories: Investment grade (AAA to BBB-) and High yield/speculative grade (BB+ and below). Ratings determine the credit spread over the risk-free rate. Key ratios used: coverage ratios, leverage ratios, liquidity ratios, profitability ratios, cash flow to debt.', module: '2' },
-  { id: 'g116', term: 'Credit Default Swap (CDS)', definition: 'Acts like an insurance policy on bond default risk. CDS buyer pays periodic premiums to the CDS seller. If the reference bond defaults, the seller pays the buyer par value or buys the defaulted bond. CDS can be used to (1) hedge default risk on bond holdings, or (2) speculate that a bond\'s credit quality will deteriorate. Total CDS outstanding can exceed the total bonds outstanding — "naked CDS" positions.', module: '2' },
-  { id: 'g117', term: 'Collateralised Debt Obligation (CDO)', definition: 'Structured product created by pooling loans/bonds and splitting them into tranches with different risk/return profiles. Senior tranches have first claim on cash flows (lower risk, lower yield); junior/equity tranches absorb losses first (higher risk, higher yield). Mortgage-backed CDOs were central to the 2007–08 financial crisis. Created and managed by Structured Investment Vehicles (SIVs).', module: '2' },
-  { id: 'g118', term: 'Coverage Ratio', definition: 'Financial ratio used in credit analysis to assess a company\'s ability to service its debt. Interest coverage ratio = EBIT / Interest expense. A ratio below 1.5x is concerning; below 1x means the company cannot cover interest from operating income. Used by rating agencies to assess bond default risk.', module: '2' },
-  { id: 'g119', term: 'Leverage Ratio', definition: 'Measure of the proportion of debt in a company\'s capital structure. Debt-to-equity, Debt-to-EBITDA, and Debt-to-Assets are common leverage ratios used in bond credit analysis. High leverage increases default risk and leads to lower credit ratings and higher credit spreads.', module: '2' }
+  { id: 'g94', term: 'Manic-Depressive Market', definition: 'Ben Graham\'s description of market behaviour — markets swing between extreme optimism (mania) and extreme pessimism (depression) driven by investor psychology rather than fundamentals. The intelligent investor exploits these mood swings rather than being swept up in them.', module: '1' }
 
 ];
 
@@ -1282,7 +1281,6 @@ let glossModuleFilter = 'all';
 let glossAlphaFilter = 'all';
 
 const API_URL = 'https://script.google.com/macros/s/AKfycbzBnw6BtSYux5OK9PG0WdT-6Ip5TaaU9aRV8dlDBIlyWG04oyC7zXAe_qldAxW-vpjtjA/exec';
-
 const SHEET_ID = '1CicON_psZ3xP0lF6upVfhDAT04epnLemU_0OvAxsAMw';
 const SHEET_GIDS = {
   Resources: '0',
@@ -1633,42 +1631,164 @@ function isPublishedVal(val) {
 function renderResources() {
   const list = document.getElementById('resourcesList');
   let filtered = resources.filter(r => resourceFilter === 'all' || String(r.module) === String(resourceFilter));
-  // Students only see published resources
   if (!isInstructor) filtered = filtered.filter(r => isPublishedVal(r.published));
+
   if (filtered.length === 0) {
     list.innerHTML = `<div class="empty-state"><i class="ti ti-folder-x"></i><p>No resources yet${resourceFilter !== 'all' ? ' for this module' : ''}. ${isInstructor ? 'Add one above.' : 'Check back later.'}</p></div>`;
     return;
   }
-  list.innerHTML = filtered.map(r => {
-    const isPublished = isPublishedVal(r.published);
+
+  // Group by folder
+  const folderMap = {};
+  filtered.forEach(r => {
+    const folder = r.folder || 'General';
+    if (!folderMap[folder]) folderMap[folder] = [];
+    folderMap[folder].push(r);
+  });
+
+  // Sort folders: General first, then alphabetical
+  const folderOrder = Object.keys(folderMap).sort((a, b) => {
+    if (a === 'General') return -1;
+    if (b === 'General') return 1;
+    return a.localeCompare(b);
+  });
+
+  list.innerHTML = folderOrder.map(folder => {
+    const items = folderMap[folder];
+    const folderId = 'folder_' + folder.replace(/[^a-z0-9]/gi, '_');
     return `
-    <div class="resource-item" style="${!isPublished && isInstructor ? 'opacity:0.6;border-left:3px solid var(--warn,#f59e0b)' : ''}">
-      <div class="resource-icon ${r.type}">
-        <i class="ti ${typeIcons[r.type] || 'ti-file'}"></i>
-      </div>
-      <div class="resource-meta">
-        <div class="resource-title">${r.title} ${!isPublished && isInstructor ? '<span style="font-size:0.7rem;padding:2px 7px;border-radius:20px;background:#fef3c7;color:#92400e;font-weight:600;margin-left:6px">DRAFT</span>' : ''}</div>
-        <div class="resource-desc">${r.description || ''}</div>
-        <div class="resource-tags">
-          <span class="tag tag-module">${moduleNames[r.module] || 'M' + r.module}</span>
-          <span class="tag tag-type">${typeLabels[r.type] || r.type}</span>
-          ${r.session ? `<span class="tag tag-session">Session ${r.session}</span>` : ''}
+      <div class="folder-section">
+        <div class="folder-header" onclick="toggleFolder('${folderId}')">
+          <div class="folder-name">
+            <i class="ti ti-folder" style="color:var(--primary)"></i>
+            ${folder}
+            <span class="folder-count">${items.length} item${items.length !== 1 ? 's' : ''}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            ${isInstructor ? `<button class="btn btn-sm btn-outline" onclick="event.stopPropagation();renameFolder('${folder}')" title="Rename folder" style="padding:3px 8px;font-size:0.75rem"><i class="ti ti-pencil"></i></button>
+            <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deleteFolder('${folder}')" title="Delete folder (moves resources to General)" style="padding:3px 8px;font-size:0.75rem"><i class="ti ti-trash"></i></button>` : ''}
+            <i class="ti ti-chevron-down folder-toggle" id="toggle_${folderId}"></i>
+          </div>
         </div>
-      </div>
-      <div class="resource-actions">
-        ${r.url ? `<a href="${r.url}" target="_blank" class="btn btn-success btn-sm"><i class="ti ti-external-link"></i> Open</a>` : ''}
-        ${isInstructor ? `
-          <button class="btn btn-sm btn-outline" onclick="editResource('${r.id}')" title="Edit this resource">
-            <i class="ti ti-pencil"></i> Edit
-          </button>
-          <button class="btn btn-sm ${isPublished ? 'btn-warning' : 'btn-primary'}" onclick="togglePublish('${r.id}')" title="${isPublished ? 'Hide from students' : 'Publish to students'}">
-            <i class="ti ${isPublished ? 'ti-eye-off' : 'ti-eye'}"></i> ${isPublished ? 'Unpublish' : 'Publish'}
-          </button>
-          <button class="btn btn-danger btn-sm" onclick="deleteResource('${r.id}')"><i class="ti ti-trash"></i></button>
-        ` : ''}
-      </div>
-    </div>`;
+        <div class="folder-items" id="${folderId}">
+          ${items.map(r => renderResourceItem(r)).join('')}
+        </div>
+      </div>`;
   }).join('');
+}
+
+function renderResourceItem(r) {
+  const isPublished = isPublishedVal(r.published);
+  return `
+  <div class="resource-item" style="${!isPublished && isInstructor ? 'opacity:0.6;border-left:3px solid var(--warn,#f59e0b)' : ''}">
+    <div class="resource-icon ${r.type}">
+      <i class="ti ${typeIcons[r.type] || 'ti-file'}"></i>
+    </div>
+    <div class="resource-meta">
+      <div class="resource-title">${r.title} ${!isPublished && isInstructor ? '<span style="font-size:0.7rem;padding:2px 7px;border-radius:20px;background:#fef3c7;color:#92400e;font-weight:600;margin-left:6px">DRAFT</span>' : ''}</div>
+      <div class="resource-desc">${r.description || ''}</div>
+      <div class="resource-tags">
+        <span class="tag tag-module">${moduleNames[r.module] || 'M' + r.module}</span>
+        <span class="tag tag-type">${typeLabels[r.type] || r.type}</span>
+        ${r.session ? `<span class="tag tag-session">Session ${r.session}</span>` : ''}
+      </div>
+    </div>
+    <div class="resource-actions">
+      ${r.url ? `<a href="${r.url}" target="_blank" class="btn btn-success btn-sm"><i class="ti ti-external-link"></i> Open</a>` : ''}
+      ${isInstructor ? `
+        <button class="btn btn-sm btn-outline" onclick="editResource('${r.id}')" title="Edit"><i class="ti ti-pencil"></i></button>
+        <button class="btn btn-sm ${isPublished ? 'btn-warning' : 'btn-primary'}" onclick="togglePublish('${r.id}')" title="${isPublished ? 'Unpublish' : 'Publish'}">
+          <i class="ti ${isPublished ? 'ti-eye-off' : 'ti-eye'}"></i>
+        </button>
+        <button class="btn btn-danger btn-sm" onclick="deleteResource('${r.id}')"><i class="ti ti-trash"></i></button>
+      ` : ''}
+    </div>
+  </div>`;
+}
+
+function toggleFolder(folderId) {
+  const items = document.getElementById(folderId);
+  const toggle = document.getElementById('toggle_' + folderId);
+  if (!items) return;
+  const collapsed = items.classList.toggle('collapsed');
+  if (toggle) toggle.classList.toggle('collapsed', collapsed);
+}
+
+// --- FOLDER MANAGEMENT ---
+
+let folders = {}; // { '1': ['Lecture Slides', 'Quizzes'], '2': [...] }
+
+function getFoldersForModule(module) {
+  return folders[String(module)] || [];
+}
+
+function populateFolderSelect(module) {
+  const mod = module || document.getElementById('res-module').value || '1';
+  const sel = document.getElementById('res-folder');
+  if (!sel) return;
+  const modFolders = getFoldersForModule(mod);
+  sel.innerHTML = `<option value="">None (General)</option>` +
+    modFolders.map(f => `<option value="${f}">${f}</option>`).join('');
+}
+
+function promptNewFolder() {
+  const mod = document.getElementById('res-module')?.value || resourceFilter !== 'all' ? resourceFilter : '1';
+  const name = prompt('Enter folder name:');
+  if (!name || !name.trim()) return;
+  const modKey = String(mod === 'all' ? '1' : mod);
+  if (!folders[modKey]) folders[modKey] = [];
+  if (!folders[modKey].includes(name.trim())) {
+    folders[modKey].push(name.trim());
+    saveFolders();
+    populateFolderSelect(modKey);
+    // Auto-select the new folder in the dropdown
+    const sel = document.getElementById('res-folder');
+    if (sel) sel.value = name.trim();
+    showToast('Folder "' + name.trim() + '" created');
+  } else {
+    showToast('Folder already exists');
+  }
+}
+
+function renameFolder(oldName) {
+  const newName = prompt('Rename folder to:', oldName);
+  if (!newName || !newName.trim() || newName.trim() === oldName) return;
+  // Update folder list
+  Object.keys(folders).forEach(mod => {
+    const idx = folders[mod].indexOf(oldName);
+    if (idx > -1) folders[mod][idx] = newName.trim();
+  });
+  // Update all resources in that folder
+  resources.forEach(r => { if (r.folder === oldName) r.folder = newName.trim(); });
+  saveFolders();
+  saveData('resources', resources);
+  saveToSheets('Resources', resources);
+  renderResources();
+  showToast('Folder renamed');
+}
+
+function deleteFolder(name) {
+  if (!confirm('Delete folder "' + name + '"? Resources will be moved to General.')) return;
+  Object.keys(folders).forEach(mod => {
+    folders[mod] = (folders[mod] || []).filter(f => f !== name);
+  });
+  resources.forEach(r => { if (r.folder === name) r.folder = ''; });
+  saveFolders();
+  saveData('resources', resources);
+  saveToSheets('Resources', resources);
+  renderResources();
+  showToast('Folder deleted — resources moved to General');
+}
+
+function saveFolders() {
+  try { localStorage.setItem('sa402_folders', JSON.stringify(folders)); } catch(e) {}
+}
+
+function loadFolders() {
+  try {
+    const f = localStorage.getItem('sa402_folders');
+    if (f) folders = JSON.parse(f);
+  } catch(e) {}
 }
 
 function togglePublish(id) {
@@ -1696,6 +1816,9 @@ function editResource(id) {
   document.getElementById('res-session').value = r.session || '';
   document.getElementById('res-type').value = r.type || 'pdf';
   document.getElementById('res-url').value = r.url || '';
+  populateFolderSelect(r.module);
+  const folderSel = document.getElementById('res-folder');
+  if (folderSel) folderSel.value = r.folder || '';
   document.querySelector('#modalResource .modal-title').innerHTML = '<i class="ti ti-pencil"></i> Edit Resource';
   document.querySelector('#modalResource .btn-primary').innerHTML = '<i class="ti ti-check"></i> Save Changes';
   openModal('modalResource');
@@ -1710,19 +1833,19 @@ function saveResource() {
   const url = document.getElementById('res-url').value.trim();
   if (!title) { alert('Please enter a title.'); return; }
 
+  const folder = document.getElementById('res-folder')?.value || '';
+
   if (editingResourceId) {
-    // Editing an existing resource — keep its id and published state
     const r = resources.find(r => r.id === editingResourceId);
     if (r) {
       r.title = title; r.description = desc; r.module = module;
-      r.session = session; r.type = type; r.url = url;
+      r.session = session; r.type = type; r.url = url; r.folder = folder;
     }
     editingResourceId = null;
-    showToast('Resource updated — saved to Google Sheet');
+    showToast('Resource updated');
   } else {
-    // New resources start as Draft by default
-    resources.push({ id: 'r' + Date.now(), title, description: desc, module, session, type, url, published: 'FALSE' });
-    showToast('Resource added as Draft — click Publish when ready to share with students');
+    resources.push({ id: 'r' + Date.now(), title, description: desc, module, session, type, url, folder, published: 'FALSE' });
+    showToast('Resource added as Draft — click Publish when ready');
   }
 
   saveData('resources', resources);
@@ -1905,6 +2028,7 @@ async function deleteGlossary(id) {
 // INIT
 // =====================
 function init() {
+  loadFolders();
   renderModuleContent();
   renderResources();
   renderAnnouncements();
@@ -1912,7 +2036,6 @@ function init() {
   buildAlphaFilter();
   renderGlossary();
   document.getElementById('gmod-all').classList.add('active');
-  // Sync from Google Sheets on every load
   syncFromSheets();
 }
 
